@@ -15,7 +15,15 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="19dp"
         android:text="@string/Connect" />
-
+	
+    <Button
+        android:id="@+id/submit2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="19dp"
+        android:text="Remove" />
+    
     <ProgressBar
         android:id="@+id/progressBar1"
         android:layout_width="wrap_content"
