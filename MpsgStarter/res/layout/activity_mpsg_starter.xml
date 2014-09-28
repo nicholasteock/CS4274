@@ -8,59 +8,169 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MpsgStarter" >
 
+    <TextView
+        android:id="@+id/connectedText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="17dp"
+        android:text="Connected!"
+        android:textSize="20sp"
+        tools:ignore="HardcodedText" />
+    
     <Button
-        android:id="@+id/submit"
+        android:id="@+id/leaveSend"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="19dp"
-        android:text="@string/Connect" />
+        android:layout_below="@+id/connectedText"
+        android:layout_marginTop="20dp"
+        android:text="Disconnect" />
+    
+    <TextView
+        android:id="@+id/welcomeText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="17dp"
+        android:text="Elderly Fall Alert System"
+        android:textSize="20sp"
+        tools:ignore="HardcodedText" />
 
     <ProgressBar
         android:id="@+id/progressBar1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/submit"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="24dp" />
-    
-     <EditText 
-        android:id="@+id/edit_message"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="250dp"
-        android:layout_toLeftOf="@+id/query"
-        android:hint="@string/edit_message" />
-
-	<Button
-        android:id="@+id/leave"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="29dp"
-        android:text="@string/Leave" />
-	
-	<Button
-        android:id="@+id/update"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="100dp"
-        android:text="@string/Update" />
-        
-    <TextView
-        android:id="@+id/textView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="300dp"
-        android:text="TextView"
-        tools:ignore="HardcodedText" />
+        android:layout_marginTop="100dp" />
 
     <Button
-        android:id="@+id/query"
+        android:id="@+id/elderlyOption"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="250dp"
-        android:layout_alignParentRight="true"
-        android:text="@string/Query" />
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/welcomeText"
+        android:layout_marginTop="20dp"
+        android:text="Elderly" />
+
+    <Button
+        android:id="@+id/caretakerOption"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/elderlyOption"
+        android:layout_marginTop="5dp"
+        android:layout_centerHorizontal="true"
+        android:text="Caretaker" />
+
+    <TextView
+        android:id="@+id/personalText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:text="Personal Details"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <EditText
+        android:id="@+id/name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/personalText"
+        android:layout_centerHorizontal="true"
+        android:ems="10"
+        android:hint="Name"
+        android:inputType="textPersonName" />
+
+    <EditText
+        android:id="@+id/userPhone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/name"
+        android:ems="10"
+        android:hint="Your Phone Number"
+        android:inputType="number" />
+    
+    <TextView
+        android:id="@+id/nokText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/userPhone"
+        android:layout_marginTop="20dp"
+        android:text="Next-Of-Kin Details"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <EditText
+        android:id="@+id/nokPhone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/nokText"
+        android:layout_marginTop="10dp"
+        android:ems="10"
+        android:hint="NOK Phone Number"
+        android:inputType="number" />
+
+    <CheckBox
+        android:id="@+id/familyMember"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/userPhone"
+        android:layout_marginTop="10dp"
+        android:text="I am a family member" />
+    
+    <TextView
+        android:id="@+id/elderlyText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/familyMember"
+        android:layout_marginTop="20dp"
+        android:text="Elderly Details"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+    
+    <EditText
+        android:id="@+id/familyMemberPhone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/elderlyText"
+        android:layout_marginTop="10dp"
+        android:ems="10"
+        android:hint="Elderly Phone Number"
+        android:inputType="number" />
+
+    <TextView
+        android:id="@+id/errorText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="80dp"
+        android:text=""
+        android:textSize="20sp"
+        tools:ignore="HardcodedText" />
+    
+    <Button
+        android:id="@+id/registerPerson"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignBaseline="@+id/optionBack"
+        android:layout_alignBottom="@+id/optionBack"
+        android:layout_alignRight="@+id/nokText"
+        android:text="Register" />
+
+    <Button
+        android:id="@+id/optionBack"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_toLeftOf="@+id/progressBar1"
+        android:text="Back" />
 
 </RelativeLayout>

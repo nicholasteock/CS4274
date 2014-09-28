@@ -9,7 +9,7 @@
     tools:context=".DataComm" >
 
     <Button
-        android:id="@+id/button1"
+        android:id="@+id/registerPerson"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
@@ -21,7 +21,7 @@
         android:id="@+id/button2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/button1"
+        android:layout_alignLeft="@+id/registerPerson"
         android:layout_centerVertical="true"
         android:text="Send Update Info" />
 

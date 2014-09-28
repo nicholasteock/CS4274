@@ -23,7 +23,7 @@ public class DataComm extends Activity {
 		super.onCreate(savedInstanceState);
 		Log.d("MPSG", "Created new intent Datacomm");
 		setContentView(R.layout.activity_data_comm);
-		sendStaticInfo = (Button) findViewById(R.id.button1);
+		sendStaticInfo = (Button) findViewById(R.id.registerPerson);
         sendStaticInfo.setOnClickListener(staticSender);
         
         sendUpdateInfo = (Button) findViewById(R.id.button2);
