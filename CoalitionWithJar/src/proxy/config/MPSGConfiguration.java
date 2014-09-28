@@ -17,7 +17,7 @@ public class MPSGConfiguration {
 
 	public static final int MPSGTIMEOUT = 60;
 	// Data Section, common for all MPSG
-	public static String coalitionIP = "192.168.10.55"; // IP of Coalition server
+	public static String coalitionIP = "192.168.1.69"; // IP of Coalition server
 	public static HashMap ipList = new HashMap();
 	public static HashMap portList = new HashMap();
 	public static HashMap socketList = new HashMap();

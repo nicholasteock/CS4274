@@ -25,6 +25,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        
+        
+      	<service android:name="mobile_psg.sensorMonitor.ContextUpdatingService" />
+      	
         <activity
             android:name="mobile_psg.tcpsession.DataComm"
             android:label="@string/title_activity_data_comm" >

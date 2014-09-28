@@ -38,10 +38,10 @@ public class MPSG {
 
 	// Context information during registration of MPSG
 	public static String mpsgName = "MPSGyy";
-	//public static String StaticContextData = "person.name::testyy,person.preference::lp,person.location::ion,person.isBusy::yes,person.speed::nil,person.action::eating,person.power::low,person.mood::happy,person.acceleration::nil,person.gravity::nil,person.magnetism::nil";
+	public static String StaticContextData = "person.name::testyy,person.preference::lp,person.location::ion,person.isBusy::yes,person.speed::nil,person.action::eating,person.power::low,person.mood::happy,person.acceleration::nil,person.gravity::nil,person.magnetism::nil";
 	public static String StaticContextData2 = "person.name::karwai,person.preference::pc,person.location::home,person.isBusy::yes,person.speed::nil,person.action::eating,person.power::low,person.mood::happy,person.acceleration::nil,person.gravity::nil,person.magnetism::nil";
-	public static String ContextType = "ELDERLY";
-	public static String StaticContextData = "elderly.name::lala,elderly.status::normal";
+	public static String ContextType = "PERSON";
+	//public static String StaticContextData = "elderly.name::lala,elderly.status::normal";
 	public static HashMap DynamicContextData = new HashMap(); // All updates to sensor information are pushed into this 
 	
 	// Set by discovery mechanism
@@ -61,11 +61,11 @@ public class MPSG {
 	
 	// Temporary query string to be sent to the proxy
 	String queryString = mpsgName + ";query:select person.preference from person where person.name = \"testmpsgname1\"";
-	String updateString = "update::person.name::testmpsgname1,person.preference::pc,person.location::home,person.isBusy::yes,person.speed::nil,person.action::eating,person.power::low,person.mood::happy,person.acceleration::nil,person.gravity::nil,person.magnetism::nil";
+	//String updateString = "update::person.name::testmpsgname1,person.preference::pc,person.location::home,person.isBusy::yes,person.speed::nil,person.action::eating,person.power::low,person.mood::happy,person.acceleration::nil,person.gravity::nil,person.magnetism::nil";
 	//String queryString = mpsgName + ";query:select person.magnetism from person where person.acceleration = \"fast\" and person.gravity=\"medium\"";
 //	String queryString = mpsgName + ";query:select person.location,person.magnetism from person where person.acceleration = \"fast\" and person.name = \"testmpsgname2\"";// ) or ( person.acceleration = \"fast\" and person.magnetism = \"positive\" )";
 	
-	MPSG(Context context, int port) { //pass in Object of Elderly/Caretaker
+	MPSG(Context context, int port) { //pass in HashMap of Elderly/Caretaker
 		serverPort = port;
 		basecontext = context;
 		conn = new TCP_Session_Handler();
@@ -74,17 +74,36 @@ public class MPSG {
 		Intent networkManager = new Intent(basecontext, NetworkManager.class);
 		basecontext.startService(networkManager);
 		
-		register(/*object*/);
+		//register(/*HashMap*/);
 		
 		
 		// Temporarily assign ip of proxy for testing
 		/*
 		try {
-			proxyIp = InetAddress.getByName("192.168.10.55");
+			proxyIp = InetAddress.getByName("192.168.1.69");
 		} catch (Exception e) {}*/
 	} 
 	
-	public void register(/*object*/) {
+	public void register(HashMap RegisterData) {
+		
+		mpsgName = "MPSG" + (String)RegisterData.get("Name");
+		ContextType = (String) RegisterData.get("Type");
+		
+		if(ContextType == "ELDERLY") {
+			StaticContextData = "elderly.name::" + (String)RegisterData.get("Name") + ",elderly.status::normal,elderly.phonenum::nil,elderly.ipaddress::nil,elder.location::nil";
+		}
+		else {
+			StaticContextData = "caretaker.identity::" + (String)RegisterData.get("Identity") + ",caretaker.name::" + (String)RegisterData.get("Name") + ",caretaker.location::nil,caretaker.ipaddress::nil";
+			
+			if((String)RegisterData.get("Identity") == "family") {
+				StaticContextData += ",caretaker.elderlynum::12345678";
+			} 
+			else {
+				StaticContextData += ",caretaker.elderlynum::nil";
+			}
+			
+		}
+		
 		
 		//Change the StaticContext and Context Type based on object passed in
 	}
@@ -219,7 +238,7 @@ public class MPSG {
 		
 		/*
 		try {
-		proxyIp = InetAddress.getByName("192.168.10.55");
+		proxyIp = InetAddress.getByName("192.168.1.69");
 		} catch(Exception e) {}*/
 		
 		// Create socket connection to the proxy
@@ -266,8 +285,8 @@ public class MPSG {
 			name = "testmpsgnamekw";
 		
 		//queryString = temp[0] + ";query:select person." + temp[1] + " from person where person.name = \"" + name + "\"";
-		//queryString = mpsgName + ";query:select person." + temp[1] + " from person where person.name = \"" + temp[0] + "\"";
-		queryString = mpsgName + ";query:select elderly." + temp[1] + " from elderly where elderly.name = \"" + temp[0] + "\"";
+		queryString = mpsgName + ";query:select person." + temp[1] + " from person where person.name = \"" + temp[0] + "\"";
+		//queryString = mpsgName + ";query:select elderly." + temp[1] + " from elderly where elderly.name = \"" + temp[0] + "\"";
 		// Send the query through the socket connection with proxy
 		try {
 			Log.d("MPSG", "Sending the query to the proxy");
@@ -285,7 +304,8 @@ public class MPSG {
 	}
 	
 	public void updateContext() {
-		
+		String attribute = (String) MPSG.DynamicContextData.get("person.acceleration");
+		String updateString = "update::person.name::testyy,person.preference::" + attribute + ",person.location::home,person.isBusy::yes,person.speed::nil,person.action::eating,person.power::low,person.mood::happy,person.acceleration::nil,person.gravity::nil,person.magnetism::nil";
 		try {
 			Log.d("MPSG", "Sending the query to the proxy");
 			conn.sendUpdate(updateString);

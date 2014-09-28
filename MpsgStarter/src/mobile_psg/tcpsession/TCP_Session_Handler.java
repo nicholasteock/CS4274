@@ -88,7 +88,7 @@ public class TCP_Session_Handler {
 						String response = "update::";
 						Log.d("MPSG", "Attribs: " + attrib);
 
-						MPSG.DynamicContextData.put("person.acceleration", "slow");
+						//MPSG.DynamicContextData.put("person.acceleration", "slow");
 						MPSG.DynamicContextData.put("person.gravity", "high");
 						MPSG.DynamicContextData.put("person.light", "medium");
 						MPSG.DynamicContextData.put("person.magnetism", "positive");
