@@ -65,7 +65,7 @@ public class MPSG {
 	//String queryString = mpsgName + ";query:select person.magnetism from person where person.acceleration = \"fast\" and person.gravity=\"medium\"";
 //	String queryString = mpsgName + ";query:select person.location,person.magnetism from person where person.acceleration = \"fast\" and person.name = \"testmpsgname2\"";// ) or ( person.acceleration = \"fast\" and person.magnetism = \"positive\" )";
 	
-	MPSG(Context context, int port) { //pass in Object of Elderly/Caretaker
+	MPSG(Context context, int port, HashMap<String, String> registerParams) { //pass in Object of Elderly/Caretaker
 		serverPort = port;
 		basecontext = context;
 		conn = new TCP_Session_Handler();
@@ -74,7 +74,7 @@ public class MPSG {
 		Intent networkManager = new Intent(basecontext, NetworkManager.class);
 		basecontext.startService(networkManager);
 		
-		register(/*object*/);
+		register( registerParams );
 		
 		
 		// Temporarily assign ip of proxy for testing
@@ -84,7 +84,7 @@ public class MPSG {
 		} catch (Exception e) {}*/
 	} 
 	
-	public void register(/*object*/) {
+	public void register( HashMap<String, String> registerParams ) {
 		
 		//Change the StaticContext and Context Type based on object passed in
 	}

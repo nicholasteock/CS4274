@@ -108,17 +108,12 @@ public class MpsgStarter extends Activity {
 	        String myConnectStatus = savedInstanceState.getString("connStatus");
 	        Log.d("MPSG", "connstatus="+myConnectStatus);
 	        if (myConnectStatus.contentEquals("invisible")) {
-//	        	connect.setVisibility(View.INVISIBLE);
 	        	loadConnectedScreen();
 	        }
 	  
 	        String myQueryStatus = savedInstanceState.getString("queryStatus");
 	        Log.d("MPSG", "querystatus="+myQueryStatus);
 	        if (myQueryStatus.contentEquals("visible")) {
-//	        	query.setVisibility(View.VISIBLE);
-//	        	leave.setVisibility(View.VISIBLE);
-//	        	update.setVisibility(View.VISIBLE);
-//	        	edit.setVisibility(View.VISIBLE);
 	        	loadFirstScreen();
 	        }
         }
@@ -299,12 +294,92 @@ public class MpsgStarter extends Activity {
 		return true;
     };
 
-    // @KAR WAI: This function is called after validation of user inputs
-    // Suggesting this to be used for registering the user, similar to
-    // the connectListener functionality in the previous 'connect' button.
+    // Forms user hashmap for registration
+    private HashMap<String, String> formRegisterHashMap() {
+    	HashMap<String, String> registerParams = new HashMap<String, String>();
+    	
+    	if( userChoice == "elderly" ) {
+			String inputName 		= name.getText().toString();
+			String inputPhone 		= userPhone.getText().toString();
+			String inputNokPhone 	= nokPhone.getText().toString();
+		
+			registerParams.put("identity", "elderly");
+			registerParams.put("username", inputName);
+			registerParams.put("userPhone", inputPhone);
+			registerParams.put("nokPhone", inputNokPhone);
+		}
+		
+		if( userChoice == "caretaker" ) {
+			String inputName 		= name.getText().toString();
+			String inputPhone 		= userPhone.getText().toString();
+			String inputFamilyPhone = familyMemberPhone.getText().toString();    			
+			
+			registerParams.put("identity", "caretaker");
+			registerParams.put("username", inputName);
+			registerParams.put("userPhone", inputPhone);
+			
+			if( isFamilyMember.isChecked() ) {
+				registerParams.put("isFamily", "true");
+				registerParams.put("familyMemberPhone", inputFamilyPhone);
+			}
+			else {
+				registerParams.put("isFamily", "false");
+			}
+		}
+		
+		return registerParams;
+    };
+    
     private void registerUser( HashMap<String, String> registerParams ) {
     	loadRegisteringScreen();
-    }
+    	
+    	mProgress.setVisibility(View.VISIBLE);
+    	mpsg = new MPSG(getBaseContext(), SERVERPORT, registerParams);
+    	
+    	long registerStartTime = System.currentTimeMillis();
+    	long registerEndTime = 0;
+    	
+    	// Search for a proxy and connect to the best proxy
+    	MPSG.searchProxy(); // Commented temporarily to test the MPSG-proxy-coalition flow
+    	
+    	/*// Connect to the selected proxy
+    	Thread mpsgconnect = new Thread() {
+    		public void run() {
+    			mpsg.connect();
+    		}
+    	};
+    	mpsgconnect.start();*/
+    	
+    	int i = 0;
+    	// Wait for a result in registering through proxy
+    	while (MPSG.statusString.contentEquals("Connecting")) {
+    		if (i > timeout) {
+    			errorText.setText("Error in waiting for result in registration with proxy");
+    			return;
+    		}
+    		try {
+    			Thread.sleep(500);
+    		} catch (Exception e) {
+	        	errorText.setText("Error in waiting for result in registration with proxy");
+    		}
+    	}
+    	
+    	if (MPSG.statusString.contentEquals("Connected")) {
+    		registerEndTime = System.currentTimeMillis();
+        	// Start the Service which updates the context information for the MPSG
+        	Intent contextUpdater = new Intent(myContext, ContextUpdatingService.class);
+        	startService(contextUpdater);
+        	
+        	connStatus = "invisible";
+        	loadConnectedScreen();
+        	
+    	} else {
+    		registerEndTime = System.currentTimeMillis();
+    		errorText.setText("FAILED: "+ MPSG.statusString);
+    		// TODO: Code for starting MPSG old directly without proxy
+    	}
+    	Log.d("EXPERIMENTAL_RESULTS", "Total response time for registration: " + Math.abs(registerEndTime - registerStartTime));
+    };
     
     private OnClickListener isFamilyMemberListener = new OnClickListener() {
     	public void onClick(View v) {
@@ -348,99 +423,10 @@ public class MpsgStarter extends Activity {
     private OnClickListener registerPersonListener = new OnClickListener() {
     	public void onClick(View v) {
     		if( validateUserInputs() ) {
-    			if( userChoice == "elderly" ) {
-    				String inputName 		= name.getText().toString();
-    				String inputPhone 		= userPhone.getText().toString();
-    				String inputNokPhone 	= nokPhone.getText().toString();
-    			
-    				registerParams.put("identity", "elderly");
-    				registerParams.put("username", inputName);
-    				registerParams.put("userPhone", inputPhone);
-    				registerParams.put("nokPhone", inputNokPhone);
-    			}
-    			
-    			if( userChoice == "caretaker" ) {
-    				String inputName 		= name.getText().toString();
-    				String inputPhone 		= userPhone.getText().toString();
-    				String inputFamilyPhone = familyMemberPhone.getText().toString();    			
-    				
-    				registerParams.put("identity", "caretaker");
-    				registerParams.put("username", inputName);
-    				registerParams.put("userPhone", inputPhone);
-    				
-    				if( isFamilyMember.isChecked() ) {
-    					registerParams.put("isFamily", "true");
-    					registerParams.put("familyMemberPhone", inputFamilyPhone);
-    				}
-    				else {
-    					registerParams.put("isFamily", "false");
-    				}
-    			}
-    			
-    			// @KAR WAI: I left off from here.
+    			registerParams = formRegisterHashMap();		
     			registerUser( registerParams );
     		}
     	}
-    };
-    
-    private OnClickListener connectListener = new OnClickListener() { 
-        @Override
-        public void onClick(View v) {
-        	mProgress.setVisibility(View.VISIBLE);
-        	mpsg = new MPSG(getBaseContext(), SERVERPORT);
-        	
-        	long registerStartTime = System.currentTimeMillis();
-        	long registerEndTime = 0;
-        	
-        	// Search for a proxy and connect to the best proxy
-        	MPSG.searchProxy(); // Commented temporarily to test the MPSG-proxy-coalition flow
-        	
-        	/*// Connect to the selected proxy
-        	Thread mpsgconnect = new Thread() {
-        		public void run() {
-        			mpsg.connect();
-        		}
-        	};
-        	mpsgconnect.start();*/
-        	
-        	int i = 0;
-        	// Wait for a result in registering through proxy
-        	while (MPSG.statusString.contentEquals("Connecting")) {
-        		if (i > timeout) {
-        			errorText.setText("Error in waiting for result in registration with proxy");
-        			return;
-        		}
-        		try {
-        			Thread.sleep(500);
-        		} catch (Exception e) {
-    	        	errorText.setText("Error in waiting for result in registration with proxy");
-        		}
-        	}
-        	
-        	if (MPSG.statusString.contentEquals("Connected")) {
-        		registerEndTime = System.currentTimeMillis();
-	        	// Start the Service which updates the context information for the MPSG
-	        	Intent contextUpdater = new Intent(myContext, ContextUpdatingService.class);
-	        	startService(contextUpdater);
-	        	
-	        	connStatus = "invisible";
-//	        	connect.setText(connStatus);
-//	        	connect.setVisibility(View.INVISIBLE);
-//	        	queryStatus = "visible";
-//	        	query.setVisibility(View.VISIBLE);
-//	        	leave.setVisibility(View.VISIBLE);
-//	        	update.setVisibility(View.VISIBLE);
-//	        	edit.setVisibility(View.VISIBLE);
-	        	
-	        	loadConnectedScreen();
-	        	
-        	} else {
-        		registerEndTime = System.currentTimeMillis();
-//        		errorText.setText("FAILED: "+ MPSG.statusString);
-        		// TODO: Code for starting MPSG old directly without proxy
-        	}
-        	Log.d("EXPERIMENTAL_RESULTS", "Total response time for registration: " + Math.abs(registerEndTime - registerStartTime));
-        }      
     };
     
     private OnClickListener updateSendListener = new OnClickListener() { 
@@ -474,11 +460,11 @@ public class MpsgStarter extends Activity {
 //        }      
 //    };
     
-    public static void setQueryResult (String result) {
-    	Log.d("MPSG", "Setting query result to " + result);
-    	resultStr = result + "\n";
-    	Log.d("EXPERIMENTAL_RESULTS", "Time for getting query response:" + Math.abs(System.currentTimeMillis() - MPSG.queryStart));
-    }
+//    public static void setQueryResult (String result) {
+//    	Log.d("MPSG", "Setting query result to " + result);
+//    	resultStr = result + "\n";
+//    	Log.d("EXPERIMENTAL_RESULTS", "Time for getting query response:" + Math.abs(System.currentTimeMillis() - MPSG.queryStart));
+//    }
     
     private Runnable updateText = new Runnable() {
     	public void run() {
@@ -515,13 +501,7 @@ public class MpsgStarter extends Activity {
         	}
         	if (MPSG.leaveStatusString.contentEquals("Disconnected")) {
 	        	connStatus = "visible";
-//	        	connect.setText("Start Mobile PSG");
-//	        	connect.setVisibility(View.VISIBLE);
-//	        	queryStatus = "invisible";
-//	        	query.setVisibility(View.INVISIBLE);
-//	        	leave.setVisibility(View.INVISIBLE);
-//	        	update.setVisibility(View.INVISIBLE);
-//	        	edit.setVisibility(View.INVISIBLE);
+	        	loadFirstScreen();
 	        	errorText.setText("");
 	        	resultString = "";
 	        	       	
