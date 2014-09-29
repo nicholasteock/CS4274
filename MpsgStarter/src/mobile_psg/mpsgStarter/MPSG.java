@@ -274,7 +274,7 @@ public class MPSG {
 	 * Initiate a query request to the proxy
 	 * 
 	 */
-	public void sendQuery(String message) {
+	public static void sendQuery(String message) {
 		// conn object will be set during connect call
 		String temp[]= message.split(" ");
 		
@@ -285,12 +285,13 @@ public class MPSG {
 			name = "testmpsgnamekw";
 		
 		//queryString = temp[0] + ";query:select person." + temp[1] + " from person where person.name = \"" + name + "\"";
-		queryString = mpsgName + ";query:select person." + temp[1] + " from person where person.name = \"" + temp[0] + "\"";
+		//queryString = mpsgName + ";query:select person." + temp[1] + " from person where person.name = \"" + temp[0] + "\"";
+		String qqueryString = mpsgName + ";query:select person.preference from person where person.name = \"testyy\"";
 		//queryString = mpsgName + ";query:select elderly." + temp[1] + " from elderly where elderly.name = \"" + temp[0] + "\"";
 		// Send the query through the socket connection with proxy
 		try {
 			Log.d("MPSG", "Sending the query to the proxy");
-			conn.sendQuery(queryString);
+			conn.sendQuery(qqueryString);
 		} catch (Exception e) {
 			Log.d("MPSG", "Error in sending query to the proxy");
 		}
@@ -303,7 +304,7 @@ public class MPSG {
 		}*/
 	}
 	
-	public void updateContext() {
+	public static void updateContext() {
 		String attribute = (String) MPSG.DynamicContextData.get("person.acceleration");
 		String updateString = "update::person.name::testyy,person.preference::" + attribute + ",person.location::home,person.isBusy::yes,person.speed::nil,person.action::eating,person.power::low,person.mood::happy,person.acceleration::nil,person.gravity::nil,person.magnetism::nil";
 		try {

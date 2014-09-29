@@ -8,6 +8,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import java.lang.Math;
 
 public class ContextUpdatingService extends IntentService implements SensorEventListener{
 	// data
@@ -46,7 +47,21 @@ public class ContextUpdatingService extends IntentService implements SensorEvent
 			int sensorType = event.sensor.getType();
 			switch(sensorType) {
 			case Sensor.TYPE_ACCELEROMETER:
-				MPSG.DynamicContextData.put("person.acceleration", valueString);
+				
+				float vals[] = event.values;
+			    //int sensor=arg0.sensor.getType();
+			    double xx=event.values[0];
+			    double yy=event.values[1];
+			    double zz=event.values[2];
+			    double accel = Math.round(Math.sqrt(Math.pow(xx, 2)
+			                                    +Math.pow(yy, 2)
+			                                    +Math.pow(zz, 2)));
+			    if(accel > 20.0) {
+			    	valueString = Double.toString(accel);
+			    	MPSG.DynamicContextData.put("person.acceleration", valueString);
+			    	MPSG.updateContext();
+			    	MPSG.sendQuery("");
+			    }
 				break;
 			case Sensor.TYPE_GRAVITY:
 				MPSG.DynamicContextData.put("person.gravity", valueString);
