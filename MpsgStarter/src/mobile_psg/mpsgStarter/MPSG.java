@@ -65,7 +65,7 @@ public class MPSG {
 	//String queryString = mpsgName + ";query:select person.magnetism from person where person.acceleration = \"fast\" and person.gravity=\"medium\"";
 //	String queryString = mpsgName + ";query:select person.location,person.magnetism from person where person.acceleration = \"fast\" and person.name = \"testmpsgname2\"";// ) or ( person.acceleration = \"fast\" and person.magnetism = \"positive\" )";
 	
-	MPSG(Context context, int port) { //pass in HashMap of Elderly/Caretaker
+	MPSG(Context context, int port) { //pass in hash:  HashMap<String, String> registerData
 		serverPort = port;
 		basecontext = context;
 		conn = new TCP_Session_Handler();
@@ -74,7 +74,7 @@ public class MPSG {
 		Intent networkManager = new Intent(basecontext, NetworkManager.class);
 		basecontext.startService(networkManager);
 		
-		//register(/*HashMap*/);
+		//register(registerData);
 		
 		
 		// Temporarily assign ip of proxy for testing
@@ -84,21 +84,24 @@ public class MPSG {
 		} catch (Exception e) {}*/
 	} 
 	
-	public void register(HashMap RegisterData) {
+	public void register(HashMap<String, String> RegisterData) {
 		
-		mpsgName = "MPSG" + (String)RegisterData.get("Name");
-		ContextType = (String) RegisterData.get("Type");
+		mpsgName = "MPSG" + RegisterData.get("username");
+		ContextType = RegisterData.get("identity");
 		
-		if(ContextType == "ELDERLY") {
-			StaticContextData = "elderly.name::" + (String)RegisterData.get("Name") + ",elderly.status::normal,elderly.phonenum::nil,elderly.ipaddress::nil,elder.location::nil";
+		if(ContextType == "elderly") {
+			StaticContextData = "elderly.name::" + RegisterData.get("username") + ",elderly.status::normal,elderly.phonenum::" + RegisterData.get("userPhone") + ",elderly.noknum::" + RegisterData.get("nokPhone")+ ",elderly.ipaddress::nil,elder.location::nil";
 		}
 		else {
-			StaticContextData = "caretaker.identity::" + (String)RegisterData.get("Identity") + ",caretaker.name::" + (String)RegisterData.get("Name") + ",caretaker.location::nil,caretaker.ipaddress::nil";
+			StaticContextData = "caretaker.name::" + RegisterData.get("username") + ",caretaker.phonenum::" + RegisterData.get("userPhone") + ",caretaker.location::nil,caretaker.ipaddress::nil";
 			
-			if((String)RegisterData.get("Identity") == "family") {
-				StaticContextData += ",caretaker.elderlynum::12345678";
+			if(RegisterData.get("isFamily") == "true") {
+				
+				StaticContextData += ",caretaker.identity::family";
+				StaticContextData += ",caretaker.elderlynum::" + RegisterData.get("familyMemberPhone");
 			} 
 			else {
+				StaticContextData += ",caretaker.identity::caretaker";
 				StaticContextData += ",caretaker.elderlynum::nil";
 			}
 			
