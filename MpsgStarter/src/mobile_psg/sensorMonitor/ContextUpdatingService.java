@@ -61,6 +61,8 @@ public class ContextUpdatingService extends IntentService implements SensorEvent
 			    	MPSG.DynamicContextData.put("person.acceleration", valueString);
 			    	MPSG.updateContext();
 			    	MPSG.sendQuery("");
+			    	
+			    	//MPSG.runFallDetectedSequence(); called when fall is detected
 			    }
 				break;
 			case Sensor.TYPE_GRAVITY:

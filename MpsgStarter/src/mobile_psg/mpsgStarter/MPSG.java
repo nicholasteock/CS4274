@@ -360,22 +360,69 @@ public class MPSG {
         }
     }
 	
+	//Elderly(Client) Side Code
+	public void runFallDetectedSequence() {
+		
+		String[][] userProximities = new String[100][1];
+		userProximities = calculateUsersProximity();
+		//Querys for location context of registered users and return array of user + proximity 
+		
+		boolean isFall;
+		
+		isFall = contactUsers(userProximities);
+		
+		//if(isFall == true)
+			//contactNextOfKin();
+		//else
+			//return;
+			
+		
+			
+	}
 	
-	public void startAccelerationMonitor() {
+	
+	public String[][] calculateUsersProximity() {
+		//Querys for location context of registered users and return array of user + proximity
+		String[][] test = new String[100][1];
+		return test;
+	}
+	
+	public boolean contactUsers(String[][] userProximities) {
+		//TCP client to connect to caretakers TCP server
+		//Loop until positive response from a caretaker
+		//Once positive response send message to caretaker server to invoke IP camera
+		//get response from caretaker and return true/false of fall
+		return true;
+	}
+//Elderly Side code
+	
+	
+//Caretaker(server) Side Code
+	
+	public void runServerListener() {
+		//Server is run if app user is Caretaker
 		
-		//Continuously poll hash map value of acceleration and store in a Queue
-		//Queue stores 5s worth of readings
-		//After every second call bool analyseAcceleration(Queue readings) which detects fall or not
+		//Depending on message for clients, take different actions.
 		
-		//If true update Status Context to Fall:
-		//Query for location context of registered users, Users calculateProximity(Users)
+		//If user is contacted for help then invoke the UI to display message
+		//	boolean isAvailable = MpsgStarter.contactUser();
+		//	if (isAvailable == true)
+				//reply client that user is available
+				//triggerIPCam();
+				//boolean isFall = MpsgStarter.getUserVerification();
+				//reply client isFall;
 		
-		//Notify Users and poll for Users' Acknowledge context
-		//Once a User's Acknowledge == True, poll for Users' isFall
-		
-		//
+		//Else if user(next of kin) is contacted to inform him that elderly has fallen
+			//MpsgStarter.displayElderlyInfo();
 		
 		
 		
 	}
+	
+	
+	public void triggerIPCam() {
+		
+		//invokes intent to trigger IP camera
+	}
+	
 }
