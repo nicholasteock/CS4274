@@ -80,7 +80,7 @@ public class MPSG {
 		// Temporarily assign ip of proxy for testing
 		/*
 		try {
-			proxyIp = InetAddress.getByName("192.168.1.69");
+			proxyIp = InetAddress.getByName("192.168.10.57");
 		} catch (Exception e) {}*/
 	} 
 	
@@ -241,7 +241,7 @@ public class MPSG {
 		
 		/*
 		try {
-		proxyIp = InetAddress.getByName("192.168.1.69");
+		proxyIp = InetAddress.getByName("192.168.10.57");
 		} catch(Exception e) {}*/
 		
 		// Create socket connection to the proxy
@@ -290,8 +290,10 @@ public class MPSG {
 		//queryString = temp[0] + ";query:select person." + temp[1] + " from person where person.name = \"" + name + "\"";
 		//queryString = mpsgName + ";query:select person." + temp[1] + " from person where person.name = \"" + temp[0] + "\"";
 		String qqueryString = mpsgName + ";query:select person.preference from person where person.name = \"testyy\"";
+		//String qqueryString = mpsgName + ";query:select person.acceleration from person where person.name = \"testyy\"";
 		//queryString = mpsgName + ";query:select elderly." + temp[1] + " from elderly where elderly.name = \"" + temp[0] + "\"";
 		// Send the query through the socket connection with proxy
+		//updateContext();
 		try {
 			Log.d("MPSG", "Sending the query to the proxy");
 			conn.sendQuery(qqueryString);
