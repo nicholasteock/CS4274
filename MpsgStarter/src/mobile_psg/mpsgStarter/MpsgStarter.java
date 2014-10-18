@@ -35,11 +35,14 @@ public class MpsgStarter extends Activity {
     private Button optionBack;
     private Button registerPerson;
     private Button leaveSend;
+    private Button query;
     
     private EditText name;
     private EditText userPhone;
     private EditText nokPhone;
     private EditText familyMemberPhone;
+    private EditText queryInput;
+   
     
     private static TextView connectedText;
     private static TextView welcomeText;
@@ -74,6 +77,8 @@ public class MpsgStarter extends Activity {
         optionBack 			= (Button) findViewById(R.id.optionBack);
         registerPerson 		= (Button) findViewById(R.id.registerPerson);
         leaveSend 			= (Button) findViewById(R.id.leaveSend);
+        query 				= (Button) findViewById(R.id.query);
+       
         connectedText 		= (TextView) findViewById(R.id.connectedText);
         welcomeText 		= (TextView) findViewById(R.id.welcomeText);
         personalText 		= (TextView) findViewById(R.id.personalText);
@@ -84,6 +89,8 @@ public class MpsgStarter extends Activity {
         userPhone 			= (EditText) findViewById(R.id.userPhone);
         nokPhone 			= (EditText) findViewById(R.id.nokPhone);
         familyMemberPhone 	= (EditText) findViewById(R.id.familyMemberPhone);
+        queryInput			= (EditText) findViewById(R.id.queryInput);
+        
         
         isFamilyMember.setOnClickListener(isFamilyMemberListener);
         elderlyOption.setOnClickListener(elderlyOptionListener);
@@ -91,6 +98,7 @@ public class MpsgStarter extends Activity {
         optionBack.setOnClickListener(optionBackListener);
         registerPerson.setOnClickListener(registerPersonListener);
         leaveSend.setOnClickListener(leaveSendListener);
+        query.setOnClickListener(querySendListener);
         
         loadFirstScreen();
         
@@ -148,6 +156,8 @@ public class MpsgStarter extends Activity {
         familyMemberPhone.setVisibility(View.INVISIBLE);
         mProgress.setVisibility(View.INVISIBLE);
         isFamilyMember.setVisibility(View.INVISIBLE);
+        query.setVisibility(View.INVISIBLE);
+        queryInput.setVisibility(View.INVISIBLE);
         errorText.setText("");
     };
     
@@ -168,6 +178,8 @@ public class MpsgStarter extends Activity {
         familyMemberPhone.setVisibility(View.INVISIBLE);
         mProgress.setVisibility(View.INVISIBLE);
         isFamilyMember.setVisibility(View.INVISIBLE);
+        query.setVisibility(View.INVISIBLE);
+        queryInput.setVisibility(View.INVISIBLE);
         errorText.setText("");
     };
     
@@ -188,10 +200,14 @@ public class MpsgStarter extends Activity {
         familyMemberPhone.setVisibility(View.INVISIBLE);
         mProgress.setVisibility(View.INVISIBLE);
         isFamilyMember.setVisibility(View.VISIBLE);
+        query.setVisibility(View.INVISIBLE);
+        queryInput.setVisibility(View.INVISIBLE);
         errorText.setText("");
     };
     
     private void loadConnectedScreen() {
+    	query.setVisibility(View.VISIBLE);
+    	queryInput.setVisibility(View.VISIBLE);
     	connectedText.setVisibility(View.VISIBLE);
     	leaveSend.setVisibility(View.VISIBLE);
     	welcomeText.setVisibility(View.INVISIBLE);
@@ -442,29 +458,31 @@ public class MpsgStarter extends Activity {
         }      
     };
     
-//    private OnClickListener querySendListener = new OnClickListener() { 
-//        @Override
-//        public void onClick(View v) {
-//        	
-//        	EditText editText = (EditText) findViewById(R.id.edit_message);
-//            final String message = editText.getText().toString();
-//            
-//            System.out.println(message);
-//        	// Start a new thread to send out the query
-//        	Thread queryThread = new Thread() {
-//        		public void run() {
-//        			mpsg.sendQuery(message);
-//        		}
-//        	};
-//        	queryThread.start();
-//        }      
-//    };
     
-//    public static void setQueryResult (String result) {
-//    	Log.d("MPSG", "Setting query result to " + result);
-//    	resultStr = result + "\n";
-//    	Log.d("EXPERIMENTAL_RESULTS", "Time for getting query response:" + Math.abs(System.currentTimeMillis() - MPSG.queryStart));
-//    }
+    private OnClickListener querySendListener = new OnClickListener() { 
+        @Override
+        public void onClick(View v) {
+        	
+        	EditText editText = (EditText) findViewById(R.id.queryInput);
+            final String message = editText.getText().toString();
+            
+            System.out.println(message);
+        	// Start a new thread to send out the query
+        	Thread queryThread = new Thread() {
+        		public void run() {
+        			mpsg.sendQuery(message);
+        		}
+        	};
+        	queryThread.start();
+        }      
+    };
+    
+    
+    public static void setQueryResult (String result) {
+   	Log.d("MPSG", "Setting query result to " + result);
+   	resultStr = result + "\n";
+    	Log.d("EXPERIMENTAL_RESULTS", "Time for getting query response:" + Math.abs(System.currentTimeMillis() - MPSG.queryStart));
+   }
     
     private Runnable updateText = new Runnable() {
     	public void run() {

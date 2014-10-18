@@ -80,11 +80,33 @@ public class MPSG {
 		// Temporarily assign ip of proxy for testing
 		/*
 		try {
-			proxyIp = InetAddress.getByName("192.168.10.55");
+			proxyIp = InetAddress.getByName("192.168.1.69");
 		} catch (Exception e) {}*/
 	} 
 	
-	public void register( HashMap<String, String> registerParams ) {
+public void register(HashMap<String, String> RegisterData) {
+		
+		mpsgName = "MPSG" + RegisterData.get("username");
+		ContextType = RegisterData.get("identity");
+		
+		if(ContextType == "elderly") {
+			StaticContextData = "elderly.name::" + RegisterData.get("username") + ",elderly.status::normal,elderly.phonenum::" + RegisterData.get("userPhone") + ",elderly.noknum::" + RegisterData.get("nokPhone")+ ",elderly.ipaddress::nil,elderly.location::nil";
+		}
+		else {
+			StaticContextData = "caretaker.name::" + RegisterData.get("username") + ",caretaker.phonenum::" + RegisterData.get("userPhone") + ",caretaker.location::nil,caretaker.ipaddress::nil";
+			
+			if(RegisterData.get("isFamily") == "true") {
+				
+				StaticContextData += ",caretaker.identity::family";
+				StaticContextData += ",caretaker.elderlynum::" + RegisterData.get("familyMemberPhone");
+			} 
+			else {
+				StaticContextData += ",caretaker.identity::caretaker";
+				StaticContextData += ",caretaker.elderlynum::nil";
+			}
+			
+		}
+		
 		
 		//Change the StaticContext and Context Type based on object passed in
 	}
@@ -219,7 +241,7 @@ public class MPSG {
 		
 		/*
 		try {
-		proxyIp = InetAddress.getByName("192.168.10.55");
+		proxyIp = InetAddress.getByName("192.168.1.69");
 		} catch(Exception e) {}*/
 		
 		// Create socket connection to the proxy
@@ -267,7 +289,10 @@ public class MPSG {
 		
 		//queryString = temp[0] + ";query:select person." + temp[1] + " from person where person.name = \"" + name + "\"";
 		//queryString = mpsgName + ";query:select person." + temp[1] + " from person where person.name = \"" + temp[0] + "\"";
-		queryString = mpsgName + ";query:select elderly." + temp[1] + " from elderly where elderly.name = \"" + temp[0] + "\"";
+		if(ContextType == "elderly")
+			queryString = mpsgName + ";query:select elderly." + temp[1] + " from elderly where elderly.name = \"" + temp[0] + "\"";
+		else
+			queryString = mpsgName + ";query:select caretaker." + temp[1] + " from caretaker where caretaker.name = \"" + temp[0] + "\"";
 		// Send the query through the socket connection with proxy
 		try {
 			Log.d("MPSG", "Sending the query to the proxy");

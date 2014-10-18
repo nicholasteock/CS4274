@@ -17,7 +17,7 @@ public class MPSGConfiguration {
 
 	public static final int MPSGTIMEOUT = 60;
 	// Data Section, common for all MPSG
-	public static String coalitionIP = "192.168.10.55"; // IP of Coalition server
+	public static String coalitionIP = "192.168.1.69"; // IP of Coalition server
 	public static HashMap ipList = new HashMap();
 	public static HashMap portList = new HashMap();
 	public static HashMap socketList = new HashMap();
@@ -41,12 +41,17 @@ public class MPSGConfiguration {
     	personList.add("person.magnetism");
     	personList.add("person.gravity");
     	
-    	
     	List<String> elderlyList = new ArrayList<String>();
-    	elderlyList.add("elderly.status");
+    	elderlyList.add("elderly.ipaddress");
+    	elderlyList.add("elderly.location");
+    	
+    	List<String> caretakerList = new ArrayList<String>();
+    	caretakerList.add("caretaker.ipaddress");
+    	caretakerList.add("caretaker.location");
    
     	dynAttribList.put("person", personList); // Map dynamic attributes of Person space to personList
     	dynAttribList.put("elderly", elderlyList);
+    	dynAttribList.put("caretaker", caretakerList);
     	//TODO: More static information to be added here, for other context spaces
     }
 	

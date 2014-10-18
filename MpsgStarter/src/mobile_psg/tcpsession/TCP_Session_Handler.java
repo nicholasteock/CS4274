@@ -94,7 +94,10 @@ public class TCP_Session_Handler {
 						MPSG.DynamicContextData.put("person.magnetism", "positive");
 						MPSG.DynamicContextData.put("person.location", "school");
 						MPSG.DynamicContextData.put("person.mood", "stressed");
-						MPSG.DynamicContextData.put("elderly.status", "fall");
+						MPSG.DynamicContextData.put("elderly.ipaddress", "0.0.0.0");
+						MPSG.DynamicContextData.put("elderly.location", "home");
+						MPSG.DynamicContextData.put("caretaker.ipaddress", "1.0.0.0");
+						MPSG.DynamicContextData.put("caretaker.location", "somewhere");
 						
 						for (String attribute : attrib) {
 							Log.d("MPSG", "Request for attrib: " + attribute);
