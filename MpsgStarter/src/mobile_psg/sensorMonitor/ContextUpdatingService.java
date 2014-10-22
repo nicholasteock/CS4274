@@ -21,6 +21,7 @@ public class ContextUpdatingService extends IntentService implements SensorEvent
 	private String valueString = "";
 	private boolean lowThreshold = false;
 	private boolean isStill = false;
+	private boolean isUpright = true;
 	private long start = 0;
 	private long est = 0;
 	
@@ -68,7 +69,8 @@ public class ContextUpdatingService extends IntentService implements SensorEvent
 			    valueString += Double.toString(accel);
 			    MPSG.DynamicContextData.put("person.acceleration", valueString);*/
 			   
-			    if(accel == 10.0) {
+			    
+			    if(accel >= 9.0 || accel <= 11.0) {
 			    	isStill = true;
 			    } else {
 			    	isStill = false;
@@ -117,23 +119,32 @@ public class ContextUpdatingService extends IntentService implements SensorEvent
 				break;
 			case Sensor.TYPE_GRAVITY:
 				
-				/*
+				
 				float vals2[] = event.values;
 			    //int sensor=arg0.sensor.getType();
 			    double x=event.values[0];
 			    double y=event.values[1];
 			    double z=event.values[2];
+			    /*
 			    valueString += "x";
 			    valueString += Double.toString(x);
-			    valueString += " ";
+			   valueString += " ";
 			    valueString += "y";
 			    valueString += Double.toString(y);
 			    valueString += " ";
 			    valueString += "z";
 			    valueString += Double.toString(z);
 			    valueString += " ";*/
+			    
+			    if( x >= 5.0)
+			    	isUpright = true;
+			    else
+			    	isUpright = false;
+			    
+			    
+			    
 				
-				MPSG.DynamicContextData.put("person.gravity", valueString);
+				//MPSG.DynamicContextData.put("person.acceleration", valueString);
 				break;
 			case Sensor.TYPE_LIGHT:
 				MPSG.DynamicContextData.put("person.light", valueString);
@@ -155,13 +166,17 @@ public class ContextUpdatingService extends IntentService implements SensorEvent
 				break;
 		}
 		
-		while(isStill == true) {
+		while(isStill == true && isUpright == false) {
 			
 			if((System.currentTimeMillis() - mStart) > 20000) {
-				MPSG.sendQuery("");
-				break;
+				
+				if(isUpright == false) {
+					MPSG.sendQuery("");
+					return;
+				}
 			}
 		}
+		MPSG.sendQuery("1");
 	}
 
 	@Override

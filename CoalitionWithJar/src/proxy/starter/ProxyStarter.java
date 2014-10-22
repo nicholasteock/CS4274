@@ -10,7 +10,7 @@ import proxy.discovery.SearchSubnet_Proxy;
 public class ProxyStarter {
 
 	// Data on proxy socket
-	public static String proxyIP = "192.168.10.57";  // IP of proxy 
+	public static String proxyIP = "192.168.1.69";  // IP of proxy 
 	static int SERVERPORT = 5000;  // Port where proxy is listening for PSG registration through discovery
 	static boolean active = true; // select mode of proxy here; active -> true, passive -> false
 
