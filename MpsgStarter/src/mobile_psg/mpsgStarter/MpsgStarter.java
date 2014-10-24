@@ -1,5 +1,16 @@
 package mobile_psg.mpsgStarter;
 
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesClient;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.location.LocationClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
 import java.io.BufferedReader;
 import java.net.InetAddress;
 import java.util.HashMap;
@@ -19,16 +30,21 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.mobile_psg.R;
 
-public class MpsgStarter extends Activity {
+public class MpsgStarter extends Activity implements
+GooglePlayServicesClient.ConnectionCallbacks,
+GooglePlayServicesClient.OnConnectionFailedListener{
 
 	public static MPSG mpsg = null;
     
 	private ProgressBar mProgress;
 	
 	private CheckBox isFamilyMember;
+	
+	private static LocationClient mLocationClient;
 	
 	private Button elderlyOption;
     private Button caretakerOption;
@@ -64,11 +80,39 @@ public class MpsgStarter extends Activity {
     private static String userChoice = "";
     
     HashMap<String, String> registerParams = new HashMap<String, String>();
- 
+    
+    @Override
+    public void onConnected(Bundle dataBundle) {
+        // Display the connection status
+        Toast.makeText(this, "Connected", Toast.LENGTH_SHORT).show();
+
+    }
+    
+    @Override
+    public void onDisconnected() {
+        // Display the connection status
+        Toast.makeText(this, "Disconnected. Please re-connect.",
+                Toast.LENGTH_SHORT).show();
+    }
+    
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        /*
+         * Google Play services can resolve some errors it detects.
+         * If the error has a resolution, try sending an Intent to
+         * start a Google Play services activity that can resolve
+         * error.
+         */
+    	
+       Log.d("MPSG", "Connection Failed");
+    }
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mpsg_starter);
+        
+        mLocationClient = new LocationClient(this, this, this);
 
         mProgress 			= (ProgressBar) findViewById(R.id.progressBar1);
         isFamilyMember 		= (CheckBox) findViewById(R.id.familyMember);
@@ -125,6 +169,12 @@ public class MpsgStarter extends Activity {
 	        	loadFirstScreen();
 	        }
         }
+    }
+    
+    protected void onStart() {
+        super.onStart();
+        // Connect the client.
+        mLocationClient.connect();
     }
  
     @Override
@@ -470,7 +520,8 @@ public class MpsgStarter extends Activity {
         	// Start a new thread to send out the query
         	Thread queryThread = new Thread() {
         		public void run() {
-        			mpsg.sendQuery(message);
+        			//mpsg.sendQuery(message);
+        			mpsg.runFallDetectedSequence();
         		}
         	};
         	queryThread.start();
@@ -547,4 +598,10 @@ public class MpsgStarter extends Activity {
     	}
     	return false;
     };
+    
+    public static Location getCurrentLocation() {
+    	
+    	return mLocationClient.getLastLocation();
+    };
+    
 }

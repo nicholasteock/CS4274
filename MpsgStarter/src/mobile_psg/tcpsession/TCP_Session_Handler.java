@@ -1,5 +1,16 @@
 package mobile_psg.tcpsession;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesClient;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.location.LocationClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.DataInputStream;
@@ -76,7 +87,9 @@ public class TCP_Session_Handler {
 		try {
 			while(Boolean.TRUE) { // wait for any request from server
 				String data = in.readLine();
-				//Log.d("MPSG", data + "..");
+				
+			
+				Log.d("MPSG2", data + "..");
 				if (data != null) {
 					if (data.startsWith("update")) { // query format "update::person.location;person.mood"
 						
@@ -87,7 +100,12 @@ public class TCP_Session_Handler {
 						String attrib[] = temp[1].split(";");
 						String response = "update::";
 						Log.d("MPSG", "Attribs: " + attrib);
-
+						
+						
+						Location curr = MpsgStarter.getCurrentLocation();
+						
+						
+						
 						MPSG.DynamicContextData.put("person.acceleration", "slow");
 						MPSG.DynamicContextData.put("person.gravity", "high");
 						MPSG.DynamicContextData.put("person.light", "medium");
@@ -95,9 +113,10 @@ public class TCP_Session_Handler {
 						MPSG.DynamicContextData.put("person.location", "school");
 						MPSG.DynamicContextData.put("person.mood", "stressed");
 						MPSG.DynamicContextData.put("elderly.ipaddress", "0.0.0.0");
-						MPSG.DynamicContextData.put("elderly.location", "home");
+						MPSG.DynamicContextData.put("elderly.location", Double.toString(curr.getLatitude()) + " " + Double.toString(curr.getLongitude()));
 						MPSG.DynamicContextData.put("caretaker.ipaddress", "1.0.0.0");
-						MPSG.DynamicContextData.put("caretaker.location", "somewhere");
+						MPSG.DynamicContextData.put("caretaker.location", Double.toString(curr.getLatitude()) + " " + Double.toString(curr.getLongitude()));
+						
 						
 						for (String attribute : attrib) {
 							Log.d("MPSG", "Request for attrib: " + attribute);
@@ -129,9 +148,12 @@ public class TCP_Session_Handler {
 						MPSG.queryData += data.getBytes().length;
 						Log.d("MPSG", "Got response for this query");
 						String result[] = data.split(":::");
+						
+							
 						Log.d("EXPERIMENTAL_RESULTS", "Data usage for query send: " + MPSG.queryData);
 						if (!result[1].isEmpty()) {
 							MpsgStarter.setQueryResult("Query:"+ result[0] +", Result:" + result[1]);
+							MPSG.setQueryResult(result[1]);
 						}
 					}
 				}
@@ -423,4 +445,6 @@ public class TCP_Session_Handler {
 		
 		
 	}
+	
+	
 }

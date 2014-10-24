@@ -11,13 +11,13 @@ public class PSGConfiguration {
 	public static final String RESOURCE_NAME = "PSG SIMULATOR";
 	public static String defaultName = "NUS Home"; // Name of the PSG
 
-	public static String defaultIP = "192.168.1.69"; // IP address of the PSG; getIPAddress();//
+	public static String defaultIP = "192.168.10.57"; // IP address of the PSG; getIPAddress();//
 	public static int defaultPort = 130000; // Port Number of the PSG
 	public static String defaultMac = "00-1E-4F-A7-DF-B2"; // getMacAddress(); MAC address of the PSG
 
-	public static final String CSM_REFERENCE = "http://192.168.1.69:10001/xmlrpc";
+	public static final String CSM_REFERENCE = "http://192.168.10.57:10001/xmlrpc";
 	public static int timeOutForQuery = 5000; // In Milli-Seconds
-    public static final String QP_REFERENCE = "http://192.168.1.69:10004/xmlrpc"; // psg IP
+    public static final String QP_REFERENCE = "http://192.168.10.57:10004/xmlrpc"; // psg IP
     
     
     // constructor

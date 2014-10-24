@@ -283,6 +283,18 @@ public class TCP_Session_Handler {
 	 */
 	public static void replyQuery(String name, String reply) {
 		System.out.println("Into reply query, name & reply" + name + "," + reply);
+		if(reply.contains("\n")) {
+			String temp[] = reply.split("\n");
+			reply = "";
+			for(int i=0; i <temp.length; i++) {
+				reply += temp[i];
+				if(i != temp.length - 1)
+					reply += ",";
+			}
+			
+			
+		}
+		System.out.println("REPLY: " + reply);
 		Socket sock = (Socket) MPSGConfiguration.socketList.get(name);
 		System.out.println("status in replyquery, socket isclsed? : " + sock.isClosed());
 		Socket socket = (Socket) MPSGConfiguration.socketList.get(name);
