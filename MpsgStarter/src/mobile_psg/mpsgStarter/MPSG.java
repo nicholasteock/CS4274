@@ -298,8 +298,10 @@ public class MPSG {
 			Log.d("MPSG", "Sending the query to the proxy");
 			if(message.contains("1"))
 				conn.sendQuery(qqqueryString);
-			else
+			else {
+				updateContext();
 				conn.sendQuery(qqueryString);
+			}
 		} catch (Exception e) {
 			Log.d("MPSG", "Error in sending query to the proxy");
 		}
