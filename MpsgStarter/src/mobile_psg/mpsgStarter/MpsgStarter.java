@@ -637,6 +637,7 @@ GooglePlayServicesClient.OnConnectionFailedListener{
     
     public void camera(String elderlycam){ //access ip cam
     	Intent intent = new Intent("android.intent.action.MAIN");
+    	Log.d("camera function: ", "test:" + elderlycam);
 		//intent.setComponent(ComponentName.unflattenFromString("com.ipc.ipcamera/com.ipc.newipc.LoadActivity"));
 		intent.setComponent(ComponentName.unflattenFromString("com.rcreations.ipcamviewerBasic/.WebCamViewerActivity"));
 		intent.addCategory("android.intent.category.LAUNCHER");
@@ -644,7 +645,7 @@ GooglePlayServicesClient.OnConnectionFailedListener{
 		startActivity(intent);
     }
     
-    public class ServerThread extends Thread {
+    public class ServerThread extends Thread { //tcp server
         ServerSocket serverSocket;
 
         public ServerThread() {
@@ -653,15 +654,14 @@ GooglePlayServicesClient.OnConnectionFailedListener{
 
         public void run() {
            // String incomingMsg;
-        	
-
-            try {
+        	String outgoingMsg="";
+        	try {
             	
               //  mytext.setText("Starting socket thread...\n");
 
                 serverSocket = new ServerSocket(5123);
-
-             //   mytext.setText("ServerSocket created, waiting for incomming connections...\n");
+                
+                Log.d("ServerSocket"," waiting for incoming connections...");
                 while(true){
                 Socket socket = serverSocket.accept();
                 
@@ -669,98 +669,44 @@ GooglePlayServicesClient.OnConnectionFailedListener{
                         socket.getOutputStream()));
                 BufferedReader in = new BufferedReader(new InputStreamReader(
                         socket.getInputStream()));
-              // String incomingMsg=in.readLine();
+               String incomingMsg=in.readLine();
                // camera(incomingMsg);
                 //    mytext.setText("Connection accepted, reading...\n");
 
                     while (socket.isConnected()) {
                     	
-                      //  System.out.println("Message recieved: " + incomingMsg
-                      //          + ". Answering...");
+                        Log.d("Message recieved","message:"+ incomingMsg
+                                + ". Answering...");
                     	String test="";
                     	//make button visible
                     	if(test=="yes"){
                     	String result="";
                     //	makebuttonvisible();
                         // send a message
-                        String outgoingMsg = "hello: "
+                        outgoingMsg = "hello: "
                                 + "result: " + result
                                 + System.getProperty("line.separator");
                         out.write(outgoingMsg);
                         out.flush();
                     	}
 
-                    //    mytext.setText("Message sent: " + outgoingMsg+"\n");
+                        Log.d("Message sent","Sent: " + outgoingMsg);
                     }
 
-                    if (socket.isConnected()) System.out.println("Socket still connected\n");
+                    if (socket.isConnected()) Log.d("serversocket status:", "Socket still connected");
                     else{ 
-                    	System.out.println("Socket not connected\n");
+                    	Log.d("Serversocket status: ","Socket not connected");
                     	socket.close();	
                     }
                 
                 }
             } catch (Exception e) {
-            	System.out.println("Error: " + e.getMessage()+"\n");
+            	Log.d("serversocket: ", "Error: " + e.getMessage()+"\n");
                 e.printStackTrace();
             }
 
         }
     }
     
-    private class ClientSender extends AsyncTask<String, Void, Socket> {
-        private String SERVER_IP = null;
-		private Socket socket;
-        private String answer;
-       // private Context context;
-        private BufferedWriter out;
-        private BufferedReader in;
-
-        public ClientSender() {
-            //this.context = context;
-            socket = null;
-            out = null;
-            in = null;
-            SERVER_IP="192.168.10.71";
-        }
-        
-        @Override
-        protected Socket doInBackground(String... params) {
-            try {
-                if (socket == null) {
-                    socket = new Socket(SERVER_IP, 5123);
-
-                    out = new BufferedWriter(
-                            new OutputStreamWriter(socket.getOutputStream()));
-                    in = new BufferedReader(
-                            new InputStreamReader(socket.getInputStream()));
-                }
-
-                out.write(params[0]);
-                out.flush();
-
-                answer = in.readLine() + System.getProperty("line.separator");
-
-                return socket;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            return socket;
-        }
-
-        protected void onPostExecute(Socket socket) {
-        //	TextView mytext;
-    	//	mytext= (TextView) findViewById(R.id.reply);
-            if (socket != null) {
-               // Toast.makeText(this, answer, Toast.LENGTH_LONG).show();
-         //   	mytext.append(answer);
-	 	 //       mytext.append("\n");
-            } else {
-               // Toast.makeText(context, "Can't connect to server!",
-         //   	mytext.append("Can't connect to server\n");
-            }
-
-        }
-    }
+    
 }

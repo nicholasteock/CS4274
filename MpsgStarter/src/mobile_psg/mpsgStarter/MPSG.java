@@ -1,7 +1,12 @@
 package mobile_psg.mpsgStarter;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.InetAddress;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,6 +17,7 @@ import mobile_psg.proxysearch.SearchSubnet_PSG;
 import mobile_psg.tcpsession.TCP_Session_Handler;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.util.Log;
 import android.util.Pair;
 
@@ -561,5 +567,63 @@ public void register(HashMap<String, String> RegisterData) {
 			//get response from caretaker and return true/false of fall
 		return true;
 	}
+	
+	private class ClientSender extends AsyncTask<String, Void, Socket> { //tcpclient
+        private String SERVER_IP = null;
+		private Socket socket;
+        private String answer;
+       // private Context context;
+        private BufferedWriter out;
+        private BufferedReader in;
+
+        public ClientSender() {
+            //this.context = context;
+            socket = null;
+            out = null;
+            in = null;
+            SERVER_IP="192.168.10.71";
+        }
+        
+        @Override
+        protected Socket doInBackground(String... params) {
+            try {
+                if (socket == null) {
+                    socket = new Socket(SERVER_IP, 5123);
+
+                    out = new BufferedWriter(
+                            new OutputStreamWriter(socket.getOutputStream()));
+                    in = new BufferedReader(
+                            new InputStreamReader(socket.getInputStream()));
+                }
+
+                out.write(params[0]);
+                out.flush();
+
+                answer = in.readLine() + System.getProperty("line.separator");
+
+                return socket;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return socket;
+        }
+
+        protected void onPostExecute(Socket socket) {
+        //	TextView mytext;
+    	//	mytext= (TextView) findViewById(R.id.reply);
+            if (socket != null) {
+               // Toast.makeText(this, answer, Toast.LENGTH_LONG).show();
+         //   	mytext.append(answer);
+	 	 //       mytext.append("\n");
+            	Log.d("clientsocket", "reply: " +answer);
+            } else {
+               // Toast.makeText(context, "Can't connect to server!",
+         //   	mytext.append("Can't connect to server\n");
+            	Log.d("clientsocket", "cannot connect to server");
+            }
+
+        }
+    }
 	
 }
