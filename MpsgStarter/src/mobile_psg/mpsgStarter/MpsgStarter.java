@@ -645,6 +645,8 @@ GooglePlayServicesClient.OnConnectionFailedListener{
 		startActivity(intent);
     }
     
+    //ServerThread server= new ServerThread();
+    //server.start();
     public class ServerThread extends Thread { //tcp server
         ServerSocket serverSocket;
 

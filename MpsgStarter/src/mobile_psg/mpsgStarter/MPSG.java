@@ -10,6 +10,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import mobile_psg.networkmanagement.NetworkManager;
 import mobile_psg.proxysearch.DNSProxySearch;
@@ -69,6 +70,8 @@ public class MPSG {
 	public static boolean isQueryReady = false;
 	public static String  queryResult = "";
 	
+	//declare clientsender
+	private ClientSender clientsender;
 	// Temporary query string to be sent to the proxy
 	String queryString = mpsgName + ";query:select person.preference from person where person.name = \"testmpsgname1\"";
 	String updateString = "update::person.name::testmpsgname1,person.preference::pc,person.location::home,person.isBusy::yes,person.speed::nil,person.action::eating,person.power::low,person.mood::happy,person.acceleration::nil,person.gravity::nil,person.magnetism::nil";
@@ -86,11 +89,10 @@ public class MPSG {
 		
 		register( registerParams );
 		
-		
 		// Temporarily assign ip of proxy for testing
 		/*
 		try {
-			proxyIp = InetAddress.getByName("192.168.10.57");
+			proxyIp = InetAddress.getByName("192.168.0.14");
 		} catch (Exception e) {}*/
 	} 
 	
@@ -251,7 +253,7 @@ public void register(HashMap<String, String> RegisterData) {
 		
 		/*
 		try {
-		proxyIp = InetAddress.getByName("192.168.10.57");
+		proxyIp = InetAddress.getByName("192.168.0.14");
 		} catch(Exception e) {}*/
 		
 		// Create socket connection to the proxy
@@ -420,6 +422,7 @@ public void register(HashMap<String, String> RegisterData) {
 		
 		List<String> sortedContacts = getContacts(contacts, locations);
 		
+		boolean result = contactUsers(sortedContacts);
 		/*
 
 		
@@ -560,15 +563,27 @@ public void register(HashMap<String, String> RegisterData) {
 		return test;
 	}
 		
-	public boolean contactUsers(String[][] userProximities) {
+	public boolean contactUsers(List<String> userProximities) {
 			//TCP client to connect to caretakers TCP server
 			//Loop until positive response from a caretaker
 			//Once positive response send message to caretaker server to invoke IP camera
 			//get response from caretaker and return true/false of fall
+		String result="";
+		 clientsender= new ClientSender("192.168.0.23");
+	     try {
+			result=clientsender.execute("192.168.1.1:8091").get();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	     Log.d("contactuser","result is: "+ result);
 		return true;
 	}
 	
-	private class ClientSender extends AsyncTask<String, Void, Socket> { //tcpclient
+	private class ClientSender extends AsyncTask<String, Void, String> { //tcpclient
         private String SERVER_IP = null;
 		private Socket socket;
         private String answer;
@@ -576,16 +591,16 @@ public void register(HashMap<String, String> RegisterData) {
         private BufferedWriter out;
         private BufferedReader in;
 
-        public ClientSender() {
+        public ClientSender(String ip) {
             //this.context = context;
             socket = null;
             out = null;
             in = null;
-            SERVER_IP="192.168.10.71";
+            SERVER_IP=ip;
         }
         
         @Override
-        protected Socket doInBackground(String... params) {
+        protected String doInBackground(String... params) {
             try {
                 if (socket == null) {
                     socket = new Socket(SERVER_IP, 5123);
@@ -600,18 +615,19 @@ public void register(HashMap<String, String> RegisterData) {
                 out.flush();
 
                 answer = in.readLine() + System.getProperty("line.separator");
-
-                return socket;
+                socket.close();
+                return answer;
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
-            return socket;
+            return "";
         }
 
-        protected void onPostExecute(Socket socket) {
+        protected void onPostExecute(String answer) {
         //	TextView mytext;
     	//	mytext= (TextView) findViewById(R.id.reply);
+        	Log.d("clientsocket", "Outside if " +answer);
             if (socket != null) {
                // Toast.makeText(this, answer, Toast.LENGTH_LONG).show();
          //   	mytext.append(answer);
