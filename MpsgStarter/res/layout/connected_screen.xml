@@ -1,0 +1,91 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin" >
+
+	<TextView
+        android:id="@+id/connectedText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="17dp"
+        android:text=""
+        android:textSize="20sp"
+        tools:ignore="HardcodedText" />
+	
+    <Button
+        android:id="@+id/leaveSend"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/connectedText"
+        android:layout_marginTop="20dp"
+        android:text="Disconnect" />
+    
+ 	<TextView
+        android:id="@+id/fallalertText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="17dp"
+        android:text="A fall has been detected!\nView feed?"
+        android:textSize="20sp"
+        android:gravity="center"
+        tools:ignore="HardcodedText" />
+
+    <Button
+        android:id="@+id/ignorefall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/viewfall"
+        android:layout_alignBottom="@+id/viewfall"
+        android:layout_alignRight="@+id/fallalertText"
+        android:text="Ignore" />
+
+    <Button
+        android:id="@+id/viewfall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/fallalertText"
+        android:layout_below="@+id/fallalertText"
+        android:layout_marginTop="40dp"
+        android:text="View" />
+
+    <TextView
+        android:id="@+id/verifyfallText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="17dp"
+        android:text="Video viewed\nPlease Respond"
+        android:textSize="20sp"
+        android:gravity="center"
+        tools:ignore="HardcodedText" />
+
+    <Button
+        android:id="@+id/falsefall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/realfall"
+        android:layout_alignBottom="@+id/realfall"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="42dp"
+        android:text="False Alarm" />
+
+    <Button
+        android:id="@+id/realfall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/verifyfallText"
+        android:layout_marginTop="34dp"
+        android:layout_toLeftOf="@+id/falsefall"
+        android:text="Helping" />
+
+</RelativeLayout>
