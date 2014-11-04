@@ -6,12 +6,14 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.InetAddress;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import mobile_psg.mpsgStarter.MpsgStarter.ServerThread;
 import mobile_psg.networkmanagement.NetworkManager;
 import mobile_psg.proxysearch.DNSProxySearch;
 import mobile_psg.proxysearch.SearchSubnet_PSG;
@@ -72,6 +74,7 @@ public class MPSG {
 	
 	//declare clientsender
 	private ClientSender clientsender;
+	private Thread serverthread= null;
 	// Temporary query string to be sent to the proxy
 	String queryString = mpsgName + ";query:select person.preference from person where person.name = \"testmpsgname1\"";
 	String updateString = "update::person.name::testmpsgname1,person.preference::pc,person.location::home,person.isBusy::yes,person.speed::nil,person.action::eating,person.power::low,person.mood::happy,person.acceleration::nil,person.gravity::nil,person.magnetism::nil";
@@ -106,7 +109,9 @@ public void register(HashMap<String, String> RegisterData) {
 		}
 		else {
 			StaticContextData = "caretaker.name::" + RegisterData.get("username") + ",caretaker.phonenum::" + RegisterData.get("userPhone") + ",caretaker.location::nil,caretaker.ipaddress::nil";
-			
+	       
+		//	this.serverthread= new Thread(new ServerThread());
+	     //   this.serverthread.start();
 			if(RegisterData.get("isFamily") == "true") {
 				
 				StaticContextData += ",caretaker.identity::family";
@@ -568,6 +573,7 @@ public void register(HashMap<String, String> RegisterData) {
 			//Loop until positive response from a caretaker
 			//Once positive response send message to caretaker server to invoke IP camera
 			//get response from caretaker and return true/false of fall
+		Log.d("contactuser", "attempting to connect");
 		String result="";
 		 clientsender= new ClientSender("192.168.0.23");
 	     try {
@@ -582,6 +588,75 @@ public void register(HashMap<String, String> RegisterData) {
 	     Log.d("contactuser","result is: "+ result);
 		return true;
 	}
+	public class ServerThread implements Runnable { //tcp server
+        ServerSocket serverSocket;
+
+        public ServerThread() {
+        	
+        }
+
+        public void run() {
+           // String incomingMsg;
+        	String outgoingMsg="";
+        	try {
+            	
+              //  mytext.setText("Starting socket thread...\n");
+
+                serverSocket = new ServerSocket(5123);
+                
+                Log.d("ServerSocket"," waiting for incoming connections...");
+                while(true){
+                	try{
+                	Log.d("ServerSocket","Before accept...");	
+                	Socket socket = serverSocket.accept();
+                
+                BufferedWriter out = new BufferedWriter(new OutputStreamWriter(
+                        socket.getOutputStream()));
+                BufferedReader in = new BufferedReader(new InputStreamReader(
+                        socket.getInputStream()));
+               String incomingMsg=in.readLine();
+               // camera(incomingMsg);
+                //    mytext.setText("Connection accepted, reading...\n");
+               Log.d("ServerSocket","Connected to server");
+                    while (socket.isConnected()) {
+                    	
+                        Log.d("Message recieved","message:"+ incomingMsg
+                                + ". Answering...");
+                    	String test="";
+                    	//make button visible
+                    	if(test=="yes"){
+                    	String result="";
+                    //	makebuttonvisible();
+                        // send a message
+                        outgoingMsg = "hello: "
+                                + "result: " + result
+                                + System.getProperty("line.separator");
+                        out.write(outgoingMsg);
+                        out.flush();
+                    	}
+
+                        Log.d("Message sent","Sent: " + outgoingMsg);
+                    }
+
+                    if (socket.isConnected()) Log.d("serversocket status:", "Socket still connected");
+                    else{ 
+                    	Log.d("Serversocket status: ","Socket not connected");
+                    	socket.close();	
+                    }
+                
+                }catch(IOException e)
+                	{
+                		Log.d("Serversocket", "error at accept");
+                	}
+                }
+            } catch (Exception e) {
+            	Log.d("serversocket: ", "Error: " + e.getMessage()+"\n");
+                e.printStackTrace();
+            }
+
+        }
+        
+    }
 	
 	private class ClientSender extends AsyncTask<String, Void, String> { //tcpclient
         private String SERVER_IP = null;
@@ -610,12 +685,12 @@ public void register(HashMap<String, String> RegisterData) {
                     in = new BufferedReader(
                             new InputStreamReader(socket.getInputStream()));
                 }
-
+                Log.d("clientsocket","sent to server:" + params[0]);
                 out.write(params[0]);
                 out.flush();
 
                 answer = in.readLine() + System.getProperty("line.separator");
-                socket.close();
+                Log.d("clientsocket","reply from server:" + answer);
                 return answer;
             } catch (IOException e) {
                 e.printStackTrace();
@@ -627,7 +702,13 @@ public void register(HashMap<String, String> RegisterData) {
         protected void onPostExecute(String answer) {
         //	TextView mytext;
     	//	mytext= (TextView) findViewById(R.id.reply);
-        	Log.d("clientsocket", "Outside if " +answer);
+        	Log.d("clientsocket", "at execute " +answer);
+        	try {
+				socket.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
           /*  if (socket != null) {
                // Toast.makeText(this, answer, Toast.LENGTH_LONG).show();
          //   	mytext.append(answer);

@@ -96,7 +96,7 @@ GooglePlayServicesClient.OnConnectionFailedListener{
     private static String helpStatus = "";
     
     private static String userChoice = "";
-    
+  //  private ServerThread server;
     HashMap<String, String> registerParams = new HashMap<String, String>();
     
     @Override
@@ -261,6 +261,8 @@ GooglePlayServicesClient.OnConnectionFailedListener{
         isFamilyMember.setVisibility(View.VISIBLE);
      //   query.setVisibility(View.INVISIBLE);
      //   queryInput.setVisibility(View.INVISIBLE);
+
+        
         errorText.setText("");
     };
     
@@ -323,6 +325,8 @@ GooglePlayServicesClient.OnConnectionFailedListener{
         verifyfallText.setVisibility(View.INVISIBLE);
         falsefall.setVisibility(View.INVISIBLE);
         realfall.setVisibility(View.INVISIBLE);
+        
+
         
         query.setVisibility(View.VISIBLE);
         queryInput.setVisibility(View.VISIBLE);
@@ -777,6 +781,7 @@ GooglePlayServicesClient.OnConnectionFailedListener{
                 
                 Log.d("ServerSocket"," waiting for incoming connections...");
                 while(true){
+                	Log.d("ServerSocket","Before accept...");	
                 Socket socket = serverSocket.accept();
                 
                 BufferedWriter out = new BufferedWriter(new OutputStreamWriter(
@@ -786,7 +791,7 @@ GooglePlayServicesClient.OnConnectionFailedListener{
                String incomingMsg=in.readLine();
                // camera(incomingMsg);
                 //    mytext.setText("Connection accepted, reading...\n");
-
+               Log.d("ServerSocket","Connected to server");
                     while (socket.isConnected()) {
                     	
                         Log.d("Message recieved","message:"+ incomingMsg
