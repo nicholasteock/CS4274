@@ -63,20 +63,26 @@ GooglePlayServicesClient.OnConnectionFailedListener{
     private Button registerPerson;
     private Button leaveSend;
     private Button query;
+    private Button bluetooth;
+    private Button viewfall;
+    private Button ignorefall;
+    private Button realfall;
+    private Button falsefall;
     
     private EditText name;
     private EditText userPhone;
     private EditText nokPhone;
     private EditText familyMemberPhone;
     private EditText queryInput;
-   
     
-    private static TextView connectedText;
     private static TextView welcomeText;
     private static TextView personalText;
     private static TextView nokText;
     private static TextView elderlyText;
     private static TextView errorText;
+    private static TextView connectedText;
+    private static TextView fallalertText;
+    private static TextView verifyfallText;
     
     private int timeout = 10; //10 seconds timeout for connecting
     private static final int SERVERPORT = 5000;
@@ -87,6 +93,7 @@ GooglePlayServicesClient.OnConnectionFailedListener{
     private static String connStatus = "Start MPSG";
     private static String resultString = "";
     private static String queryStatus = "invisible";
+    private static String helpStatus = "";
     
     private static String userChoice = "";
     
@@ -131,10 +138,8 @@ GooglePlayServicesClient.OnConnectionFailedListener{
         caretakerOption 	= (Button) findViewById(R.id.caretakerOption);
         optionBack 			= (Button) findViewById(R.id.optionBack);
         registerPerson 		= (Button) findViewById(R.id.registerPerson);
-        leaveSend 			= (Button) findViewById(R.id.leaveSend);
         query 				= (Button) findViewById(R.id.query);
        
-        connectedText 		= (TextView) findViewById(R.id.connectedText);
         welcomeText 		= (TextView) findViewById(R.id.welcomeText);
         personalText 		= (TextView) findViewById(R.id.personalText);
         nokText 			= (TextView) findViewById(R.id.nokText);
@@ -152,7 +157,6 @@ GooglePlayServicesClient.OnConnectionFailedListener{
         caretakerOption.setOnClickListener(caretakerOptionListener);
         optionBack.setOnClickListener(optionBackListener);
         registerPerson.setOnClickListener(registerPersonListener);
-        leaveSend.setOnClickListener(leaveSendListener);
         query.setOnClickListener(querySendListener);
         
         loadFirstScreen();
@@ -201,8 +205,6 @@ GooglePlayServicesClient.OnConnectionFailedListener{
     };
     
     private void loadFirstScreen() {
-    	connectedText.setVisibility(View.INVISIBLE);
-    	leaveSend.setVisibility(View.INVISIBLE);
     	welcomeText.setVisibility(View.VISIBLE);
         elderlyOption.setVisibility(View.VISIBLE);
         caretakerOption.setVisibility(View.VISIBLE);
@@ -223,8 +225,6 @@ GooglePlayServicesClient.OnConnectionFailedListener{
     };
     
     private void loadElderlyRegisterScreen() {
-    	connectedText.setVisibility(View.INVISIBLE);
-    	leaveSend.setVisibility(View.INVISIBLE);
     	welcomeText.setVisibility(View.INVISIBLE);
         elderlyOption.setVisibility(View.INVISIBLE);
         caretakerOption.setVisibility(View.INVISIBLE);
@@ -245,8 +245,6 @@ GooglePlayServicesClient.OnConnectionFailedListener{
     };
     
     private void loadCaretakerRegisterScreen() {
-    	connectedText.setVisibility(View.INVISIBLE);
-    	leaveSend.setVisibility(View.INVISIBLE);
     	welcomeText.setVisibility(View.INVISIBLE);
         elderlyOption.setVisibility(View.INVISIBLE);
         caretakerOption.setVisibility(View.INVISIBLE);
@@ -267,30 +265,31 @@ GooglePlayServicesClient.OnConnectionFailedListener{
     };
     
     private void loadConnectedScreen() {
-    	query.setVisibility(View.VISIBLE);
-    	queryInput.setVisibility(View.VISIBLE);
-    	connectedText.setVisibility(View.VISIBLE);
-    	leaveSend.setVisibility(View.VISIBLE);
-    	welcomeText.setVisibility(View.INVISIBLE);
-        elderlyOption.setVisibility(View.INVISIBLE);
-        caretakerOption.setVisibility(View.INVISIBLE);
-        optionBack.setVisibility(View.INVISIBLE);
-        registerPerson.setVisibility(View.INVISIBLE);
-        personalText.setVisibility(View.INVISIBLE);
-        nokText.setVisibility(View.INVISIBLE);
-        elderlyText.setVisibility(View.INVISIBLE);
-        name.setVisibility(View.INVISIBLE);
-        userPhone.setVisibility(View.VISIBLE);
-        nokPhone.setVisibility(View.INVISIBLE);
-        familyMemberPhone.setVisibility(View.INVISIBLE);
-        mProgress.setVisibility(View.INVISIBLE);
-        isFamilyMember.setVisibility(View.INVISIBLE);
-        errorText.setText("");
+    	setContentView(R.layout.connected_screen);
+        connectedText       = (TextView) findViewById(R.id.connectedText);
+        fallalertText       = (TextView) findViewById(R.id.fallalertText);
+        verifyfallText      = (TextView) findViewById(R.id.verifyfallText);
+        leaveSend           = (Button) findViewById(R.id.leaveSend);
+        viewfall            = (Button) findViewById(R.id.viewfall);
+        ignorefall          = (Button) findViewById(R.id.ignorefall);
+        realfall            = (Button) findViewById(R.id.realfall);
+        falsefall           = (Button) findViewById(R.id.falsefall);
+        
+        leaveSend.setOnClickListener(leaveSendListener);
+        viewfall.setOnClickListener(viewfallListener);
+        ignorefall.setOnClickListener(ignorefallListener);
+        realfall.setOnClickListener(realfallListener);
+        falsefall.setOnClickListener(falsefallListener);
+        
+        if(userChoice == "caretaker") {
+            loadCaretakerConnectedScreen();
+        }
+        else {
+            loadElderlyConnectedScreen();
+        }
     };
     
     private void loadRegisteringScreen() {
-    	connectedText.setVisibility(View.INVISIBLE);
-    	leaveSend.setVisibility(View.INVISIBLE);
     	welcomeText.setVisibility(View.INVISIBLE);
         elderlyOption.setVisibility(View.INVISIBLE);
         caretakerOption.setVisibility(View.INVISIBLE);
@@ -308,7 +307,53 @@ GooglePlayServicesClient.OnConnectionFailedListener{
     	mProgress.setVisibility(View.VISIBLE);
     	errorText.setText(registerParams.toString());
     }
+
+    private void loadCaretakerConnectedScreen() {
+        connectedText.setText("Connected As Caretaker");
+        connectedText.setVisibility(View.VISIBLE);
+        leaveSend.setVisibility(View.VISIBLE);
+        fallalertText.setVisibility(View.INVISIBLE);
+        ignorefall.setVisibility(View.INVISIBLE);
+        viewfall.setVisibility(View.INVISIBLE);
+        verifyfallText.setVisibility(View.INVISIBLE);
+        falsefall.setVisibility(View.INVISIBLE);
+        realfall.setVisibility(View.INVISIBLE);
+    };
     
+    private void loadElderlyConnectedScreen() {
+        connectedText.setText("Connected As Elderly");
+        connectedText.setVisibility(View.VISIBLE);
+        leaveSend.setVisibility(View.VISIBLE);
+        fallalertText.setVisibility(View.INVISIBLE);
+        ignorefall.setVisibility(View.INVISIBLE);
+        viewfall.setVisibility(View.INVISIBLE);
+        verifyfallText.setVisibility(View.INVISIBLE);
+        falsefall.setVisibility(View.INVISIBLE);
+        realfall.setVisibility(View.INVISIBLE);
+    };
+
+    private void loadFallalertScreen() {
+        connectedText.setVisibility(View.INVISIBLE);
+        leaveSend.setVisibility(View.INVISIBLE);
+        fallalertText.setVisibility(View.VISIBLE);
+        ignorefall.setVisibility(View.VISIBLE);
+        viewfall.setVisibility(View.VISIBLE);
+        verifyfallText.setVisibility(View.INVISIBLE);
+        falsefall.setVisibility(View.INVISIBLE);
+        realfall.setVisibility(View.INVISIBLE);
+    };
+    
+    private void loadVerifyfallScreen() {
+        connectedText.setVisibility(View.INVISIBLE);
+        leaveSend.setVisibility(View.INVISIBLE);
+        fallalertText.setVisibility(View.INVISIBLE);
+        ignorefall.setVisibility(View.INVISIBLE);
+        viewfall.setVisibility(View.INVISIBLE);
+        verifyfallText.setVisibility(View.VISIBLE);
+        falsefall.setVisibility(View.VISIBLE);
+        realfall.setVisibility(View.VISIBLE);
+    };
+
     // Checks user inputs before submitting for registration.
     private boolean validateUserInputs() {
     	
@@ -471,7 +516,6 @@ GooglePlayServicesClient.OnConnectionFailedListener{
     	}
     };
 
-    
     private OnClickListener elderlyOptionListener = new OnClickListener() {
     	public void onClick(View v) {
     		userChoice = "elderly";
@@ -487,7 +531,6 @@ GooglePlayServicesClient.OnConnectionFailedListener{
     		loadCaretakerRegisterScreen();
         }
     };
-    
     
     private OnClickListener optionBackListener = new OnClickListener() {
     	public void onClick(View v) {
@@ -519,7 +562,6 @@ GooglePlayServicesClient.OnConnectionFailedListener{
         }      
     };
     
-    
     private OnClickListener querySendListener = new OnClickListener() { 
         @Override
         public void onClick(View v) {
@@ -539,12 +581,11 @@ GooglePlayServicesClient.OnConnectionFailedListener{
         }      
     };
     
-    
     public static void setQueryResult (String result) {
-   	Log.d("MPSG", "Setting query result to " + result);
-   	resultStr = result + "\n";
-    	Log.d("EXPERIMENTAL_RESULTS", "Time for getting query response:" + Math.abs(System.currentTimeMillis() - MPSG.queryStart));
-   }
+       	Log.d("MPSG", "Setting query result to " + result);
+       	resultStr = result + "\n";
+        Log.d("EXPERIMENTAL_RESULTS", "Time for getting query response:" + Math.abs(System.currentTimeMillis() - MPSG.queryStart));
+    }
     
     private Runnable updateText = new Runnable() {
     	public void run() {
@@ -600,6 +641,43 @@ GooglePlayServicesClient.OnConnectionFailedListener{
         }      
     };
     
+    private OnClickListener viewfallListener = new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Log.d("FALLFLOW", "In viewfalllistener");
+            setHelpstatus("");
+            loadVerifyfallScreen();
+            camera("Someelderly");
+        }
+    };
+    
+    private OnClickListener ignorefallListener = new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Log.d("FALLFLOW", "In ignorefallListener");
+            setHelpstatus("ignoreFall");
+            loadCaretakerConnectedScreen();
+        }
+    };
+    
+    private OnClickListener realfallListener = new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Log.d("FALLFLOW", "In realfallListener");
+            setHelpstatus("realfall");
+            loadCaretakerConnectedScreen();
+        }
+    };
+    
+    private OnClickListener falsefallListener = new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Log.d("FALLFLOW", "In falsefallListener");
+            setHelpstatus("falsefall");
+            loadCaretakerConnectedScreen();
+        }
+    };
+
     // Helper function to check phone number
     public static boolean isValidPhone(String inputData ) {
     	if( inputData.matches("[-+]?\\d+(\\.\\d+)?") ) {
@@ -608,6 +686,28 @@ GooglePlayServicesClient.OnConnectionFailedListener{
     		};
     	}
     	return false;
+    };
+
+    public static void setHelpstatus(String value) {
+        helpStatus = value;
+        getCaretakerResponse();
+    };
+
+    public static void getCaretakerResponse() {
+        Log.d("FALLFLOW", "In getCaretakerResponse helpStatus="+helpStatus);
+
+        // Caretaker chose to ignore fall
+        if(helpStatus == "ignorefall") {
+            return;
+        }
+        // Caretaker acknowledge fall is real and is going to help
+        if(helpStatus == "realfall") {
+            return;
+        }
+        // Caretaker verified fall is false alarm
+        if(helpStatus == "falsefall") {
+            return;
+        }
     };
     
     public static Location getCurrentLocation() {

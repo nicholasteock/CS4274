@@ -7,26 +7,6 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MpsgStarter" >
-
-    <TextView
-        android:id="@+id/connectedText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="17dp"
-        android:text="Connected!"
-        android:textSize="20sp"
-        tools:ignore="HardcodedText" />
-    
-    <Button
-        android:id="@+id/leaveSend"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@+id/connectedText"
-        android:layout_marginTop="20dp"
-        android:text="Disconnect" />
     
     <TextView
         android:id="@+id/welcomeText"
@@ -63,23 +43,6 @@
         android:layout_marginTop="5dp"
         android:layout_centerHorizontal="true"
         android:text="Caretaker" />
-    
-   
-   <Button
-        android:id="@+id/query"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="250dp"
-        android:layout_alignParentRight="true"
-        android:text="@string/Query" />
-   
-   <EditText 
-        android:id="@+id/queryInput"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="250dp"
-        android:layout_toLeftOf="@+id/query"
-        android:hint="@string/edit_message" />
 
     <TextView
         android:id="@+id/personalText"
@@ -189,5 +152,12 @@
         android:layout_alignParentBottom="true"
         android:layout_toLeftOf="@+id/progressBar1"
         android:text="Back" />
+    
+    <Button
+        android:id="@+id/bluetooth"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:text="Bluetooth" />
 
 </RelativeLayout>
