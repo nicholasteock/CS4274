@@ -160,4 +160,5 @@
         android:layout_alignParentBottom="true"
         android:text="Bluetooth" />
 
+
 </RelativeLayout>

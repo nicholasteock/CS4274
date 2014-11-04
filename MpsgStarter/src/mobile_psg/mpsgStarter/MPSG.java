@@ -628,7 +628,7 @@ public void register(HashMap<String, String> RegisterData) {
         //	TextView mytext;
     	//	mytext= (TextView) findViewById(R.id.reply);
         	Log.d("clientsocket", "Outside if " +answer);
-            if (socket != null) {
+          /*  if (socket != null) {
                // Toast.makeText(this, answer, Toast.LENGTH_LONG).show();
          //   	mytext.append(answer);
 	 	 //       mytext.append("\n");
@@ -638,7 +638,7 @@ public void register(HashMap<String, String> RegisterData) {
          //   	mytext.append("Can't connect to server\n");
             	Log.d("clientsocket", "cannot connect to server");
             }
-
+			*/
         }
     }
 	

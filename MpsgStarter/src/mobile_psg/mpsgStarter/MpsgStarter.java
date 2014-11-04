@@ -138,7 +138,7 @@ GooglePlayServicesClient.OnConnectionFailedListener{
         caretakerOption 	= (Button) findViewById(R.id.caretakerOption);
         optionBack 			= (Button) findViewById(R.id.optionBack);
         registerPerson 		= (Button) findViewById(R.id.registerPerson);
-        query 				= (Button) findViewById(R.id.query);
+  //      query 				= (Button) findViewById(R.id.query);
        
         welcomeText 		= (TextView) findViewById(R.id.welcomeText);
         personalText 		= (TextView) findViewById(R.id.personalText);
@@ -149,7 +149,7 @@ GooglePlayServicesClient.OnConnectionFailedListener{
         userPhone 			= (EditText) findViewById(R.id.userPhone);
         nokPhone 			= (EditText) findViewById(R.id.nokPhone);
         familyMemberPhone 	= (EditText) findViewById(R.id.familyMemberPhone);
-        queryInput			= (EditText) findViewById(R.id.queryInput);
+  //      queryInput			= (EditText) findViewById(R.id.queryInput);
         
         
         isFamilyMember.setOnClickListener(isFamilyMemberListener);
@@ -157,7 +157,7 @@ GooglePlayServicesClient.OnConnectionFailedListener{
         caretakerOption.setOnClickListener(caretakerOptionListener);
         optionBack.setOnClickListener(optionBackListener);
         registerPerson.setOnClickListener(registerPersonListener);
-        query.setOnClickListener(querySendListener);
+        
         
         loadFirstScreen();
         
@@ -219,8 +219,8 @@ GooglePlayServicesClient.OnConnectionFailedListener{
         familyMemberPhone.setVisibility(View.INVISIBLE);
         mProgress.setVisibility(View.INVISIBLE);
         isFamilyMember.setVisibility(View.INVISIBLE);
-        query.setVisibility(View.INVISIBLE);
-        queryInput.setVisibility(View.INVISIBLE);
+     //   query.setVisibility(View.INVISIBLE);
+     //   queryInput.setVisibility(View.INVISIBLE);
         errorText.setText("");
     };
     
@@ -239,8 +239,8 @@ GooglePlayServicesClient.OnConnectionFailedListener{
         familyMemberPhone.setVisibility(View.INVISIBLE);
         mProgress.setVisibility(View.INVISIBLE);
         isFamilyMember.setVisibility(View.INVISIBLE);
-        query.setVisibility(View.INVISIBLE);
-        queryInput.setVisibility(View.INVISIBLE);
+   //     query.setVisibility(View.INVISIBLE);
+   //     queryInput.setVisibility(View.INVISIBLE);
         errorText.setText("");
     };
     
@@ -259,8 +259,8 @@ GooglePlayServicesClient.OnConnectionFailedListener{
         familyMemberPhone.setVisibility(View.INVISIBLE);
         mProgress.setVisibility(View.INVISIBLE);
         isFamilyMember.setVisibility(View.VISIBLE);
-        query.setVisibility(View.INVISIBLE);
-        queryInput.setVisibility(View.INVISIBLE);
+     //   query.setVisibility(View.INVISIBLE);
+     //   queryInput.setVisibility(View.INVISIBLE);
         errorText.setText("");
     };
     
@@ -275,11 +275,16 @@ GooglePlayServicesClient.OnConnectionFailedListener{
         realfall            = (Button) findViewById(R.id.realfall);
         falsefall           = (Button) findViewById(R.id.falsefall);
         
+        query 				= (Button) findViewById(R.id.query);
+        queryInput			= (EditText) findViewById(R.id.queryInput);
+        
         leaveSend.setOnClickListener(leaveSendListener);
         viewfall.setOnClickListener(viewfallListener);
         ignorefall.setOnClickListener(ignorefallListener);
         realfall.setOnClickListener(realfallListener);
         falsefall.setOnClickListener(falsefallListener);
+        
+        query.setOnClickListener(querySendListener);
         
         if(userChoice == "caretaker") {
             loadCaretakerConnectedScreen();
@@ -318,6 +323,9 @@ GooglePlayServicesClient.OnConnectionFailedListener{
         verifyfallText.setVisibility(View.INVISIBLE);
         falsefall.setVisibility(View.INVISIBLE);
         realfall.setVisibility(View.INVISIBLE);
+        
+        query.setVisibility(View.VISIBLE);
+        queryInput.setVisibility(View.VISIBLE);
     };
     
     private void loadElderlyConnectedScreen() {
@@ -330,6 +338,9 @@ GooglePlayServicesClient.OnConnectionFailedListener{
         verifyfallText.setVisibility(View.INVISIBLE);
         falsefall.setVisibility(View.INVISIBLE);
         realfall.setVisibility(View.INVISIBLE);
+        
+        query.setVisibility(View.VISIBLE);
+        queryInput.setVisibility(View.VISIBLE);
     };
 
     private void loadFallalertScreen() {
@@ -562,7 +573,8 @@ GooglePlayServicesClient.OnConnectionFailedListener{
         }      
     };
     
-    private OnClickListener querySendListener = new OnClickListener() { 
+   
+   private OnClickListener querySendListener = new OnClickListener() { 
         @Override
         public void onClick(View v) {
         	

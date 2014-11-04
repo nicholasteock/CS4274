@@ -87,5 +87,20 @@
         android:layout_marginTop="34dp"
         android:layout_toLeftOf="@+id/falsefall"
         android:text="Helping" />
+    <Button
+        android:id="@+id/query"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="250dp"
+        android:layout_alignParentRight="true"
+        android:text="@string/Query" />
+   
+   <EditText 
+        android:id="@+id/queryInput"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="250dp"
+        android:layout_toLeftOf="@+id/query"
+        android:hint="@string/edit_message" />
 
 </RelativeLayout>
