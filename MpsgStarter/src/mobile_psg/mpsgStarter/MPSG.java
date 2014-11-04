@@ -6,14 +6,16 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import mobile_psg.mpsgStarter.MpsgStarter.ServerThread;
 import mobile_psg.networkmanagement.NetworkManager;
 import mobile_psg.proxysearch.DNSProxySearch;
 import mobile_psg.proxysearch.SearchSubnet_PSG;
@@ -74,7 +76,7 @@ public class MPSG {
 	
 	//declare clientsender
 	private ClientSender clientsender;
-	private Thread serverthread= null;
+
 	// Temporary query string to be sent to the proxy
 	String queryString = mpsgName + ";query:select person.preference from person where person.name = \"testmpsgname1\"";
 	String updateString = "update::person.name::testmpsgname1,person.preference::pc,person.location::home,person.isBusy::yes,person.speed::nil,person.action::eating,person.power::low,person.mood::happy,person.acceleration::nil,person.gravity::nil,person.magnetism::nil";
@@ -110,8 +112,13 @@ public void register(HashMap<String, String> RegisterData) {
 		else {
 			StaticContextData = "caretaker.name::" + RegisterData.get("username") + ",caretaker.phonenum::" + RegisterData.get("userPhone") + ",caretaker.location::nil,caretaker.ipaddress::nil";
 	       
-		//	this.serverthread= new Thread(new ServerThread());
-	     //   this.serverthread.start();
+			Thread serverthread= new Thread(){
+				public void run()
+				{
+					serverstart();
+				}
+			};
+	        serverthread.start();
 			if(RegisterData.get("isFamily") == "true") {
 				
 				StaticContextData += ",caretaker.identity::family";
@@ -577,7 +584,7 @@ public void register(HashMap<String, String> RegisterData) {
 		String result="";
 		 clientsender= new ClientSender("192.168.0.23");
 	     try {
-			result=clientsender.execute("192.168.1.1:8091").get();
+			result=clientsender.execute("192.168.1.1:8091"+"\n").get();
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -588,6 +595,8 @@ public void register(HashMap<String, String> RegisterData) {
 	     Log.d("contactuser","result is: "+ result);
 		return true;
 	}
+	
+	/*
 	public class ServerThread implements Runnable { //tcp server
         ServerSocket serverSocket;
 
@@ -657,7 +666,92 @@ public void register(HashMap<String, String> RegisterData) {
         }
         
     }
-	
+	*/
+	 public String getLocalIpAddress() {//get ipv4 address of device
+	    	String ip="";
+	        try {
+	            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
+	                NetworkInterface intf = en.nextElement();
+	                for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
+	                    InetAddress inetAddress = enumIpAddr.nextElement();
+	                  //  if (!inetAddress.isLoopbackAddress()) {
+	                    if(inetAddress.isSiteLocalAddress()){
+	                    	ip = "local address: "+ inetAddress.getHostAddress() +"\n";
+	                    }
+	                }
+	            }
+	            return ip;
+	        } catch (SocketException ex) {
+	            ex.printStackTrace();
+	        }
+	        return null;
+	    }
+	 
+	private void serverstart(){
+		ServerSocket serverSocket;
+		String outgoingMsg="";
+    	try {        	
+          //  mytext.setText("Starting socket thread...\n");
+
+            	Log.d("ServerSocket",getLocalIpAddress());
+            while(true){
+            	serverSocket = new ServerSocket(5123);
+                
+                Log.d("ServerSocket"," waiting for incoming connections...");
+            	Socket socket = serverSocket.accept();
+            	BufferedWriter out = new BufferedWriter(new OutputStreamWriter(
+                        socket.getOutputStream()));
+
+            BufferedReader in = new BufferedReader(new InputStreamReader(
+                    socket.getInputStream()));
+          String incomingMsg=in.readLine();
+        //    String incomingMsg="something";
+           // camera(incomingMsg);
+            //    mytext.setText("Connection accepted, reading...\n");
+           Log.d("ServerSocket","Connected to server");
+           int i=1;
+                while (socket.isConnected()) {
+                	
+                    
+                	String test="";
+                	//make button visible
+                	if(i==1)
+                	{
+                		test="yes";
+                	}
+                	if(i==2){test="";}
+                	if(test=="yes"){
+                		Log.d("Message recieved","message:"+ incomingMsg
+                                + ". Answering...");
+                	String result="hello";
+                //	makebuttonvisible();
+                    // send a message
+                    outgoingMsg =  "result: " + result
+                            + System.getProperty("line.separator");
+                    
+                    out.write(outgoingMsg);
+                    out.flush();
+                    Log.d("Message sent","Sent: " + outgoingMsg);
+                	}
+
+                    i++;
+                }
+
+                if (socket.isConnected()) Log.d("serversocket status:", "Socket still connected");
+                else{ 
+                	Log.d("Serversocket status: ","Socket not connected");
+                	socket.close();	
+                }
+                serverSocket.close();
+            }
+            
+            
+        } catch (Exception e) {
+        	Log.d("serversocket: ", "Error: " + e.getMessage()+"\n");
+            e.printStackTrace();
+        }
+    	
+	}
 	private class ClientSender extends AsyncTask<String, Void, String> { //tcpclient
         private String SERVER_IP = null;
 		private Socket socket;
@@ -688,7 +782,7 @@ public void register(HashMap<String, String> RegisterData) {
                 Log.d("clientsocket","sent to server:" + params[0]);
                 out.write(params[0]);
                 out.flush();
-
+                
                 answer = in.readLine() + System.getProperty("line.separator");
                 Log.d("clientsocket","reply from server:" + answer);
                 return answer;
