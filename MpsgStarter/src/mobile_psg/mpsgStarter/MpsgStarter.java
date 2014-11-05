@@ -7,7 +7,6 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
-
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -23,28 +22,39 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.util.Enumeration;
 import java.util.HashMap;
-
+import java.util.UUID;
 import mobile_psg.sensorMonitor.ContextUpdatingService;
 import mobile_psg.tcpsession.TCP_Session_Handler;
+import android.annotation.TargetApi;
 import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import android.widget.AdapterView.OnItemClickListener;
 import com.example.mobile_psg.R;
 
+@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1)
 public class MpsgStarter extends Activity implements
 GooglePlayServicesClient.ConnectionCallbacks,
 GooglePlayServicesClient.OnConnectionFailedListener{
@@ -56,14 +66,13 @@ GooglePlayServicesClient.OnConnectionFailedListener{
 	private CheckBox isFamilyMember;
 	
 	private static LocationClient mLocationClient;
-	
+		
 	private Button elderlyOption;
     private Button caretakerOption;
     private Button optionBack;
     private Button registerPerson;
     private Button leaveSend;
     private Button query;
-    private Button bluetooth;
     private Button viewfall;
     private Button ignorefall;
     private Button realfall;
@@ -83,6 +92,18 @@ GooglePlayServicesClient.OnConnectionFailedListener{
     private static TextView connectedText;
     private static TextView fallalertText;
     private static TextView verifyfallText;
+    
+    // Variables used for bluetooth
+    private static CharSequence bluetoothToastText = "";
+	private static int toastDuration = Toast.LENGTH_SHORT;
+	private static int REQUEST_ENABLE_BT;
+	private static Toast bluetoothToast = null;
+	private ArrayAdapter<String> newDeviceListArrayAdapter;
+	private static TextView bluetoothText;
+	private ListView newDevicesList;
+	private BluetoothSocket socket;
+	private BluetoothDevice connect_device = null;
+	private static BluetoothAdapter bluetooth = null;
     
     private int timeout = 10; //10 seconds timeout for connecting
     private static final int SERVERPORT = 5000;
@@ -150,8 +171,6 @@ GooglePlayServicesClient.OnConnectionFailedListener{
         nokPhone 			= (EditText) findViewById(R.id.nokPhone);
         familyMemberPhone 	= (EditText) findViewById(R.id.familyMemberPhone);
   //      queryInput			= (EditText) findViewById(R.id.queryInput);
-        
-        
         isFamilyMember.setOnClickListener(isFamilyMemberListener);
         elderlyOption.setOnClickListener(elderlyOptionListener);
         caretakerOption.setOnClickListener(caretakerOptionListener);
@@ -271,6 +290,7 @@ GooglePlayServicesClient.OnConnectionFailedListener{
         connectedText       = (TextView) findViewById(R.id.connectedText);
         fallalertText       = (TextView) findViewById(R.id.fallalertText);
         verifyfallText      = (TextView) findViewById(R.id.verifyfallText);
+        bluetoothText 		= (TextView) findViewById(R.id.bluetoothText);
         leaveSend           = (Button) findViewById(R.id.leaveSend);
         viewfall            = (Button) findViewById(R.id.viewfall);
         ignorefall          = (Button) findViewById(R.id.ignorefall);
@@ -279,6 +299,8 @@ GooglePlayServicesClient.OnConnectionFailedListener{
         
         query 				= (Button) findViewById(R.id.query);
         queryInput			= (EditText) findViewById(R.id.queryInput);
+        
+		newDevicesList 		= (ListView) findViewById(R.id.new_bluetooth_devices);
         
         leaveSend.setOnClickListener(leaveSendListener);
         viewfall.setOnClickListener(viewfallListener);
@@ -319,6 +341,8 @@ GooglePlayServicesClient.OnConnectionFailedListener{
         connectedText.setText("Connected As Caretaker");
         connectedText.setVisibility(View.VISIBLE);
         leaveSend.setVisibility(View.VISIBLE);
+        bluetoothText.setVisibility(View.INVISIBLE);
+        newDevicesList.setVisibility(View.INVISIBLE);
         fallalertText.setVisibility(View.INVISIBLE);
         ignorefall.setVisibility(View.INVISIBLE);
         viewfall.setVisibility(View.INVISIBLE);
@@ -336,6 +360,8 @@ GooglePlayServicesClient.OnConnectionFailedListener{
         connectedText.setText("Connected As Elderly");
         connectedText.setVisibility(View.VISIBLE);
         leaveSend.setVisibility(View.VISIBLE);
+        bluetoothText.setVisibility(View.VISIBLE);
+        newDevicesList.setVisibility(View.VISIBLE);
         fallalertText.setVisibility(View.INVISIBLE);
         ignorefall.setVisibility(View.INVISIBLE);
         viewfall.setVisibility(View.INVISIBLE);
@@ -345,6 +371,8 @@ GooglePlayServicesClient.OnConnectionFailedListener{
         
         query.setVisibility(View.VISIBLE);
         queryInput.setVisibility(View.VISIBLE);
+        
+        enableBluetooth();
     };
 
     private void loadFallalertScreen() {
@@ -576,9 +604,8 @@ GooglePlayServicesClient.OnConnectionFailedListener{
         	updateThread.start();
         }      
     };
-    
    
-   private OnClickListener querySendListener = new OnClickListener() { 
+    private OnClickListener querySendListener = new OnClickListener() { 
         @Override
         public void onClick(View v) {
         	
@@ -705,6 +732,109 @@ GooglePlayServicesClient.OnConnectionFailedListener{
     	return false;
     };
 
+    private void enableBluetooth() {
+		if( bluetooth == null ) {
+			bluetoothToastText = "Bluetooth not supported on this device.";
+			bluetoothToast = Toast.makeText(this, bluetoothToastText, toastDuration);
+			bluetoothToast.show();
+		}
+		else {
+			if( !bluetooth.isEnabled() ) {
+				Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+				startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+			}
+			else {
+				connectBluetoothTag();
+			}
+		}
+    };
+    
+    protected void onActivityResult( int requestCode, int resultCode, Intent data ) {
+    	if( resultCode == RESULT_OK ) {
+    		connectBluetoothTag();
+    	}
+    	else {
+    		bluetoothToastText = "Bluetooth needs to be enabled.";
+			bluetoothToast = Toast.makeText(this, bluetoothToastText, toastDuration);
+			bluetoothToast.show();
+    	}
+    };
+    
+    public final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // TODO Auto-generated method stub
+            String action = intent.getAction();
+            if(BluetoothDevice.ACTION_FOUND.equals(action)) {
+            	Log.d("BLUETOOTHACTION", "action : " + action);
+                BluetoothDevice bdevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);              
+                //short rssi = intent.getExtras().getShort(BluetoothDevice.EXTRA_RSSI);;
+                if(bdevice.getBondState() != BluetoothDevice.BOND_BONDED)
+                Log.d("BLUETOOTHACTION", "bdevice : " + bdevice.getName());
+                newDeviceListArrayAdapter.add("\n" + bdevice.getName() + "\n" + bdevice.getAddress());
+                newDeviceListArrayAdapter.notifyDataSetChanged();
+            }
+            
+            if(BluetoothDevice.ACTION_UUID.equals(action)) {
+            	Log.d("BLUETOOTH", "testing");
+            	try {
+            		socket = connect_device.createRfcommSocketToServiceRecord(connect_device.getUuids()[0].getUuid());
+    	            socket.connect();
+    	            // Upon connection stop discovery and hide menu.
+//    	            bluetooth.cancelDiscovery();
+//    	            bluetoothText.setVisibility(View.VISIBLE);
+//    	            newDevicesList.setVisibility(View.VISIBLE);
+	            } catch (IOException e) {
+	                // TODO Auto-generated catch block
+	            	Log.d("BLUETOOTHACTION", "Connection failed for " + connect_device.getUuids()[0].getUuid());
+	                e.printStackTrace();
+	            }
+            }
+        }
+    };
+    
+    private void connectBluetoothTag() {
+    	bluetoothToastText = "In connect bluetooth tag";
+		bluetoothToast = Toast.makeText(this, bluetoothToastText, toastDuration);
+		bluetoothToast.show();
+		
+		bluetoothText.setText("Connect Bluetooth Tag");
+		
+		newDeviceListArrayAdapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1);
+	    newDevicesList.setAdapter(newDeviceListArrayAdapter);
+	    
+	    IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+	    filter.addAction(BluetoothDevice.ACTION_UUID);
+        registerReceiver(mReceiver, filter);
+        newDeviceListArrayAdapter.clear();
+        bluetooth.startDiscovery();
+        
+        //new_devices_list click
+        newDevicesList.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+
+                bluetooth.cancelDiscovery();
+                final String info = ((TextView) arg1).getText().toString();
+
+                //get the device address when click the device item
+                String address = info.substring(info.length()-17);
+                
+	            //connect the device when item is click
+	            if( BluetoothAdapter.checkBluetoothAddress(address) ) {
+	            	connect_device = bluetooth.getRemoteDevice(address);
+	            	
+	            	connect_device.fetchUuidsWithSdp();
+	
+	            }
+	            else {
+	            	Log.d("BLUETOOTH", "Error in address [" + address + "]");
+	            }
+            }
+        });
+    };
+    
     public static void setHelpstatus(String value) {
         helpStatus = value;
         getCaretakerResponse();
@@ -829,5 +959,12 @@ GooglePlayServicesClient.OnConnectionFailedListener{
         }
     }
     */
-    
+
+    protected void onDestroy() {
+
+        super.onDestroy();
+        if(bluetooth != null)
+            bluetooth.cancelDiscovery();
+        unregisterReceiver(mReceiver);
+    }
 }

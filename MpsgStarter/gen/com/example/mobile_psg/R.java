@@ -409,7 +409,7 @@ containing a value of this type.
     }
     public static final class id {
         public static final int action_settings=0x7f070031;
-        public static final int bluetooth=0x7f070026;
+        public static final int bluetoothText=0x7f070028;
         public static final int bluetoothTitleText=0x7f070014;
         public static final int book_now=0x7f070010;
         public static final int button2=0x7f070017;
@@ -418,7 +418,7 @@ containing a value of this type.
         public static final int buy_with_google=0x7f07000e;
         public static final int caretakerOption=0x7f07001b;
         public static final int classic=0x7f070011;
-        public static final int connectedText=0x7f070027;
+        public static final int connectedText=0x7f070026;
         public static final int elderlyOption=0x7f07001a;
         public static final int elderlyText=0x7f070022;
         public static final int errorText=0x7f070024;
@@ -431,7 +431,7 @@ containing a value of this type.
         public static final int holo_light=0x7f070006;
         public static final int hybrid=0x7f070004;
         public static final int ignorefall=0x7f07002a;
-        public static final int leaveSend=0x7f070028;
+        public static final int leaveSend=0x7f070027;
         public static final int match_parent=0x7f07000c;
         public static final int monochrome=0x7f070013;
         public static final int name=0x7f07001d;
