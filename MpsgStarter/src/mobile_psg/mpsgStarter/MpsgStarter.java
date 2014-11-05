@@ -638,6 +638,7 @@ GooglePlayServicesClient.OnConnectionFailedListener{
         	}
         	if (MPSG.leaveStatusString.contentEquals("Disconnected")) {
 	        	connStatus = "visible";
+	        	setContentView(R.layout.activity_mpsg_starter);
 	        	loadFirstScreen();
 	        	errorText.setText("");
 	        	resultString = "";
