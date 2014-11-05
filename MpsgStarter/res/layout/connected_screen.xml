@@ -27,6 +27,25 @@
         android:layout_marginTop="20dp"
         android:text="Disconnect" />
     
+    <TextView
+    	android:id="@+id/bluetoothText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="17dp"
+        android:text=""
+        android:textSize="20sp"
+        tools:ignore="HardcodedText" />
+    
+    <ListView
+        android:id="@+id/new_bluetooth_devices"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/bluetoothText"
+        android:layout_marginTop="20dp" >
+    </ListView>
+    
  	<TextView
         android:id="@+id/fallalertText"
         android:layout_width="wrap_content"
