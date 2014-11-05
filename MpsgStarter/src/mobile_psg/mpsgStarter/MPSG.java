@@ -603,8 +603,9 @@ public void register(HashMap<String, String> RegisterData) {
 			isQueryReady = false;
 			
 			Log.d("contactuser","query result:"+queryResult);
-			
-			clientsender= new ClientSender("192.168.10.56");
+			String ipadd[]= queryResult.split("=");
+			Log.d("contactuser","ipadd:"+ipadd[1]);
+			clientsender= new ClientSender(ipadd[1]);
 			try {
 				result=clientsender.execute("192.168.1.1:8091"+"\n").get();
 			} catch (InterruptedException e) {
@@ -676,8 +677,9 @@ public void register(HashMap<String, String> RegisterData) {
             //    mytext.setText("Connection accepted, reading...\n");
             	Log.d("ServerSocket","Connected to server");
             	int i=1;
-                while (socket.isConnected()) {	                    
-                	String test="";
+            	while(true)
+            	{
+            		String test="";
                 	//make button visible
                 	if(i==1)
                 	{
@@ -696,16 +698,23 @@ public void register(HashMap<String, String> RegisterData) {
                     out.write(outgoingMsg);
                     out.flush();
                     Log.d("Message sent","Sent: " + outgoingMsg);
+                    break;
                 	}
-
+                	//loadfallalertscreen
+                	//helpstatus variable
+                	//getcaretakerresponse
                     i++;
+            	}
+            	Log.d("serversocket status:","out of loop");
+                if(socket.getInputStream().read()!=-1) {	                    
+                	Log.d("serversocket status:", "Socket still connected");
                 }
-
-                if (socket.isConnected()) Log.d("serversocket status:", "Socket still connected");
-                else{ 
+                else
+                {
                 	Log.d("Serversocket status: ","Socket not connected");
                 	socket.close();	
                 }
+                
                 serverSocket.close();
             }
             
@@ -749,6 +758,7 @@ public void register(HashMap<String, String> RegisterData) {
                 
                 answer = in.readLine() + System.getProperty("line.separator");
                 Log.d("clientsocket","reply from server:" + answer);
+                socket.close();
                 return answer;
             } catch (IOException e) {
                 e.printStackTrace();
@@ -760,13 +770,13 @@ public void register(HashMap<String, String> RegisterData) {
         protected void onPostExecute(String answer) {
 
         	Log.d("clientsocket", "at execute " +answer);
-        	try {
+        	/*try {
 				socket.close();
 				Log.d("clientsocket", "closing socket");
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			}
+			}*/
 
         }
     }

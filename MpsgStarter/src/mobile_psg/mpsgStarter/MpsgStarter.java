@@ -733,6 +733,7 @@ GooglePlayServicesClient.OnConnectionFailedListener{
     };
 
     private void enableBluetooth() {
+    	bluetooth=BluetoothAdapter.getDefaultAdapter();
 		if( bluetooth == null ) {
 			bluetoothToastText = "Bluetooth not supported on this device.";
 			bluetoothToast = Toast.makeText(this, bluetoothToastText, toastDuration);
@@ -782,9 +783,9 @@ GooglePlayServicesClient.OnConnectionFailedListener{
             		socket = connect_device.createRfcommSocketToServiceRecord(connect_device.getUuids()[0].getUuid());
     	            socket.connect();
     	            // Upon connection stop discovery and hide menu.
-//    	            bluetooth.cancelDiscovery();
-//    	            bluetoothText.setVisibility(View.VISIBLE);
-//    	            newDevicesList.setVisibility(View.VISIBLE);
+    	            bluetooth.cancelDiscovery();
+    	            bluetoothText.setVisibility(View.INVISIBLE);
+    	            newDevicesList.setVisibility(View.INVISIBLE);
 	            } catch (IOException e) {
 	                // TODO Auto-generated catch block
 	            	Log.d("BLUETOOTHACTION", "Connection failed for " + connect_device.getUuids()[0].getUuid());
@@ -874,75 +875,6 @@ GooglePlayServicesClient.OnConnectionFailedListener{
 		startActivity(intent);
     }
     
-<<<<<<< HEAD
-    //ServerThread server= new ServerThread();
-    //server.start();
-    /*
-    public class ServerThread extends Thread { //tcp server
-        ServerSocket serverSocket;
-
-        public ServerThread() {
-        	
-        }
-
-        public void run() {
-           // String incomingMsg;
-        	String outgoingMsg="";
-        	try {
-            	
-              //  mytext.setText("Starting socket thread...\n");
-
-                serverSocket = new ServerSocket(5123);
-                
-                Log.d("ServerSocket"," waiting for incoming connections...");
-                while(true){
-                	Log.d("ServerSocket","Before accept...");	
-                Socket socket = serverSocket.accept();
-                
-                BufferedWriter out = new BufferedWriter(new OutputStreamWriter(
-                        socket.getOutputStream()));
-                BufferedReader in = new BufferedReader(new InputStreamReader(
-                        socket.getInputStream()));
-               String incomingMsg=in.readLine();
-               // camera(incomingMsg);
-                //    mytext.setText("Connection accepted, reading...\n");
-               Log.d("ServerSocket","Connected to server");
-                    while (socket.isConnected()) {
-                    	
-                        Log.d("Message recieved","message:"+ incomingMsg
-                                + ". Answering...");
-                    	String test="";
-                    	//make button visible
-                    	if(test=="yes"){
-                    	String result="";
-                    //	makebuttonvisible();
-                        // send a message
-                        outgoingMsg = "hello: "
-                                + "result: " + result
-                                + System.getProperty("line.separator");
-                        out.write(outgoingMsg);
-                        out.flush();
-                    	}
-
-                        Log.d("Message sent","Sent: " + outgoingMsg);
-                    }
-
-                    if (socket.isConnected()) Log.d("serversocket status:", "Socket still connected");
-                    else{ 
-                    	Log.d("Serversocket status: ","Socket not connected");
-                    	socket.close();	
-                    }
-                
-                }
-            } catch (Exception e) {
-            	Log.d("serversocket: ", "Error: " + e.getMessage()+"\n");
-                e.printStackTrace();
-            }
-
-        }
-    }
-    */
-
     protected void onDestroy() {
 
         super.onDestroy();
@@ -950,8 +882,5 @@ GooglePlayServicesClient.OnConnectionFailedListener{
             bluetooth.cancelDiscovery();
         unregisterReceiver(mReceiver);
     }
-=======
-    
-    
->>>>>>> f9ee3924384802be002893f1dee7db07e2271bb6
+
 }

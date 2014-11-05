@@ -457,7 +457,7 @@ public class TCP_Session_Handler {
                     InetAddress inetAddress = enumIpAddr.nextElement();
                   //  if (!inetAddress.isLoopbackAddress()) {
                     if(inetAddress.isSiteLocalAddress()){
-                    	ip = "local address: "+ inetAddress.getHostAddress() +"\n";
+                    	ip = inetAddress.getHostAddress();
                     }
                 }
             }
