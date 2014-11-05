@@ -152,31 +152,6 @@ GooglePlayServicesClient.OnConnectionFailedListener{
         setContentView(R.layout.activity_mpsg_starter);
         
         mLocationClient = new LocationClient(this, this, this);
-
-        mProgress 			= (ProgressBar) findViewById(R.id.progressBar1);
-        isFamilyMember 		= (CheckBox) findViewById(R.id.familyMember);
-        elderlyOption 		= (Button) findViewById(R.id.elderlyOption);
-        caretakerOption 	= (Button) findViewById(R.id.caretakerOption);
-        optionBack 			= (Button) findViewById(R.id.optionBack);
-        registerPerson 		= (Button) findViewById(R.id.registerPerson);
-  //      query 				= (Button) findViewById(R.id.query);
-       
-        welcomeText 		= (TextView) findViewById(R.id.welcomeText);
-        personalText 		= (TextView) findViewById(R.id.personalText);
-        nokText 			= (TextView) findViewById(R.id.nokText);
-        elderlyText 		= (TextView) findViewById(R.id.elderlyText);
-        errorText 			= (TextView) findViewById(R.id.errorText);
-        name 				= (EditText) findViewById(R.id.name);
-        userPhone 			= (EditText) findViewById(R.id.userPhone);
-        nokPhone 			= (EditText) findViewById(R.id.nokPhone);
-        familyMemberPhone 	= (EditText) findViewById(R.id.familyMemberPhone);
-  //      queryInput			= (EditText) findViewById(R.id.queryInput);
-        isFamilyMember.setOnClickListener(isFamilyMemberListener);
-        elderlyOption.setOnClickListener(elderlyOptionListener);
-        caretakerOption.setOnClickListener(caretakerOptionListener);
-        optionBack.setOnClickListener(optionBackListener);
-        registerPerson.setOnClickListener(registerPersonListener);
-        
         
         loadFirstScreen();
         
@@ -224,6 +199,30 @@ GooglePlayServicesClient.OnConnectionFailedListener{
     };
     
     private void loadFirstScreen() {
+    	 mProgress 			= (ProgressBar) findViewById(R.id.progressBar1);
+         isFamilyMember 		= (CheckBox) findViewById(R.id.familyMember);
+         elderlyOption 		= (Button) findViewById(R.id.elderlyOption);
+         caretakerOption 	= (Button) findViewById(R.id.caretakerOption);
+         optionBack 			= (Button) findViewById(R.id.optionBack);
+         registerPerson 		= (Button) findViewById(R.id.registerPerson);
+   //      query 				= (Button) findViewById(R.id.query);
+        
+         welcomeText 		= (TextView) findViewById(R.id.welcomeText);
+         personalText 		= (TextView) findViewById(R.id.personalText);
+         nokText 			= (TextView) findViewById(R.id.nokText);
+         elderlyText 		= (TextView) findViewById(R.id.elderlyText);
+         errorText 			= (TextView) findViewById(R.id.errorText);
+         name 				= (EditText) findViewById(R.id.name);
+         userPhone 			= (EditText) findViewById(R.id.userPhone);
+         nokPhone 			= (EditText) findViewById(R.id.nokPhone);
+         familyMemberPhone 	= (EditText) findViewById(R.id.familyMemberPhone);
+   //      queryInput			= (EditText) findViewById(R.id.queryInput);
+         isFamilyMember.setOnClickListener(isFamilyMemberListener);
+         elderlyOption.setOnClickListener(elderlyOptionListener);
+         caretakerOption.setOnClickListener(caretakerOptionListener);
+         optionBack.setOnClickListener(optionBackListener);
+         registerPerson.setOnClickListener(registerPersonListener);
+         
     	welcomeText.setVisibility(View.VISIBLE);
         elderlyOption.setVisibility(View.VISIBLE);
         caretakerOption.setVisibility(View.VISIBLE);
