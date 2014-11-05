@@ -862,25 +862,7 @@ GooglePlayServicesClient.OnConnectionFailedListener{
     	return mLocationClient.getLastLocation();
     };
     
-    public String getLocalIpAddress() {//get ipv4 address of device
-    	String ip="";
-        try {
-            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
-                NetworkInterface intf = en.nextElement();
-                for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
-                    InetAddress inetAddress = enumIpAddr.nextElement();
-                  //  if (!inetAddress.isLoopbackAddress()) {
-                    if(inetAddress.isSiteLocalAddress()){
-                    	ip = "local address: "+ inetAddress.getHostAddress() +"\n";
-                    }
-                }
-            }
-            return ip;
-        } catch (SocketException ex) {
-            ex.printStackTrace();
-        }
-        return null;
-    }
+    
     
     public void camera(String elderlycam){ //access ip cam
     	Intent intent = new Intent("android.intent.action.MAIN");
@@ -892,6 +874,7 @@ GooglePlayServicesClient.OnConnectionFailedListener{
 		startActivity(intent);
     }
     
+<<<<<<< HEAD
     //ServerThread server= new ServerThread();
     //server.start();
     /*
@@ -967,4 +950,8 @@ GooglePlayServicesClient.OnConnectionFailedListener{
             bluetooth.cancelDiscovery();
         unregisterReceiver(mReceiver);
     }
+=======
+    
+    
+>>>>>>> f9ee3924384802be002893f1dee7db07e2271bb6
 }
