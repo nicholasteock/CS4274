@@ -106,7 +106,7 @@ public class MPSG {
 		// Temporarily assign ip of proxy for testing
 		/*
 		try {
-			proxyIp = InetAddress.getByName("192.168.10.55");
+			proxyIp = InetAddress.getByName("192.168.0.14");
 		} catch (Exception e) {}*/
 	} 
 	
@@ -121,13 +121,14 @@ public void register(HashMap<String, String> RegisterData) {
 		else {
 			StaticContextData = "caretaker.name::" + RegisterData.get("username") + ",caretaker.phonenum::" + RegisterData.get("userPhone") + ",caretaker.location::nil,caretaker.ipaddress::nil";
 	       
-			Thread serverthread= new Thread(){
+		/*	Thread serverthread= new Thread(){
 				public void run()
 				{
 					serverstart();
 				}
 			};
 	        serverthread.start();
+	        */
 			if(RegisterData.get("isFamily") == "true") {
 				
 				StaticContextData += ",caretaker.identity::caretaker";
@@ -274,7 +275,7 @@ public void register(HashMap<String, String> RegisterData) {
 		
 		/*
 		try {
-		proxyIp = InetAddress.getByName("192.168.10.55");
+		proxyIp = InetAddress.getByName("192.168.0.14");
 		} catch(Exception e) {}*/
 		
 		// Create socket connection to the proxy
@@ -675,6 +676,7 @@ public void register(HashMap<String, String> RegisterData) {
         //    String incomingMsg="something";
            // camera(incomingMsg);
             //    mytext.setText("Connection accepted, reading...\n");
+            	//MpsgStarter.load
             	Log.d("ServerSocket","Connected to server");
             	int i=1;
             	while(true)
@@ -686,10 +688,10 @@ public void register(HashMap<String, String> RegisterData) {
                 		test="yes";
                 	}
                 	if(i==2){test="";}
-                	if(test=="yes"){
+                	if(MpsgStarter.getCaretakerResponse()=="realfall"||MpsgStarter.getCaretakerResponse()=="falsefall"||MpsgStarter.getCaretakerResponse()=="ignorefall"){
                 		Log.d("Message recieved","message:"+ incomingMsg
                                 + ". Answering...");
-                	String result="realfall";
+                	String result=MpsgStarter.getCaretakerResponse();
                 //	makebuttonvisible();
                     // send a message
                     outgoingMsg =  result
