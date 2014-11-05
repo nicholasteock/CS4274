@@ -732,25 +732,7 @@ GooglePlayServicesClient.OnConnectionFailedListener{
     	return mLocationClient.getLastLocation();
     };
     
-    public String getLocalIpAddress() {//get ipv4 address of device
-    	String ip="";
-        try {
-            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
-                NetworkInterface intf = en.nextElement();
-                for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
-                    InetAddress inetAddress = enumIpAddr.nextElement();
-                  //  if (!inetAddress.isLoopbackAddress()) {
-                    if(inetAddress.isSiteLocalAddress()){
-                    	ip = "local address: "+ inetAddress.getHostAddress() +"\n";
-                    }
-                }
-            }
-            return ip;
-        } catch (SocketException ex) {
-            ex.printStackTrace();
-        }
-        return null;
-    }
+    
     
     public void camera(String elderlycam){ //access ip cam
     	Intent intent = new Intent("android.intent.action.MAIN");
@@ -762,72 +744,6 @@ GooglePlayServicesClient.OnConnectionFailedListener{
 		startActivity(intent);
     }
     
-    //ServerThread server= new ServerThread();
-    //server.start();
-    /*
-    public class ServerThread extends Thread { //tcp server
-        ServerSocket serverSocket;
-
-        public ServerThread() {
-        	
-        }
-
-        public void run() {
-           // String incomingMsg;
-        	String outgoingMsg="";
-        	try {
-            	
-              //  mytext.setText("Starting socket thread...\n");
-
-                serverSocket = new ServerSocket(5123);
-                
-                Log.d("ServerSocket"," waiting for incoming connections...");
-                while(true){
-                	Log.d("ServerSocket","Before accept...");	
-                Socket socket = serverSocket.accept();
-                
-                BufferedWriter out = new BufferedWriter(new OutputStreamWriter(
-                        socket.getOutputStream()));
-                BufferedReader in = new BufferedReader(new InputStreamReader(
-                        socket.getInputStream()));
-               String incomingMsg=in.readLine();
-               // camera(incomingMsg);
-                //    mytext.setText("Connection accepted, reading...\n");
-               Log.d("ServerSocket","Connected to server");
-                    while (socket.isConnected()) {
-                    	
-                        Log.d("Message recieved","message:"+ incomingMsg
-                                + ". Answering...");
-                    	String test="";
-                    	//make button visible
-                    	if(test=="yes"){
-                    	String result="";
-                    //	makebuttonvisible();
-                        // send a message
-                        outgoingMsg = "hello: "
-                                + "result: " + result
-                                + System.getProperty("line.separator");
-                        out.write(outgoingMsg);
-                        out.flush();
-                    	}
-
-                        Log.d("Message sent","Sent: " + outgoingMsg);
-                    }
-
-                    if (socket.isConnected()) Log.d("serversocket status:", "Socket still connected");
-                    else{ 
-                    	Log.d("Serversocket status: ","Socket not connected");
-                    	socket.close();	
-                    }
-                
-                }
-            } catch (Exception e) {
-            	Log.d("serversocket: ", "Error: " + e.getMessage()+"\n");
-                e.printStackTrace();
-            }
-
-        }
-    }
-    */
+    
     
 }

@@ -1,5 +1,14 @@
 package mobile_psg.mpsgStarter;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesClient;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.location.LocationClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -121,7 +130,7 @@ public void register(HashMap<String, String> RegisterData) {
 	        serverthread.start();
 			if(RegisterData.get("isFamily") == "true") {
 				
-				StaticContextData += ",caretaker.identity::family";
+				StaticContextData += ",caretaker.identity::caretaker";
 				StaticContextData += ",caretaker.elderlynum::" + RegisterData.get("familyMemberPhone");
 			} 
 			else {
@@ -493,8 +502,9 @@ public void register(HashMap<String, String> RegisterData) {
 
 		//after querying i have 2 lists of name and location
 		String elderlyLoc[] = new String[2];
-		elderlyLoc[0] = "1.299414";
-		elderlyLoc[1] = "103.786982";
+		Location curr = MpsgStarter.getCurrentLocation();
+		elderlyLoc[0] = Double.toString(curr.getLatitude());
+		elderlyLoc[1] = Double.toString(curr.getLongitude());
 		
 		//List<String> contacts = new ArrayList<String>();
 		//List<String[]> locations = new ArrayList<String[]>();
@@ -581,92 +591,50 @@ public void register(HashMap<String, String> RegisterData) {
 			//Once positive response send message to caretaker server to invoke IP camera
 			//get response from caretaker and return true/false of fall
 		Log.d("contactuser", "attempting to connect");
-		String result="";
-		 clientsender= new ClientSender("192.168.0.23");
-	     try {
-			result=clientsender.execute("192.168.1.1:8091"+"\n").get();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		String result="ignorefall";
+		int i =0;
+		while(result.equals("ignorefall")){
+			
+			queryString = mpsgName + ";query:select caretaker.ipaddress from caretaker where caretaker.name = \"" + userProximities.get(i) + "\"";
+			conn.sendQuery(queryString);
+			
+			while(isQueryReady == false) {}
+			
+			isQueryReady = false;
+			
+			Log.d("contactuser","query result:"+queryResult);
+			
+			clientsender= new ClientSender("192.168.0.23");
+			try {
+				result=clientsender.execute("192.168.1.1:8091"+"\n").get();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			Log.d("contactuser","result is: "+ result);
+			i++;
+			
+			if(result.equals("falsefall")) //false alarm
+			{
+				return false;
+			}
+			
+			if(result.equals("realfall")) //real fall
+			{
+				return true;
+			}
+			
+			if(i==userProximities.size()) //if maximum size of the caretaker list is reached
+			{
+				return false;
+			}
 		}
-	     Log.d("contactuser","result is: "+ result);
 		return true;
 	}
 	
-	/*
-	public class ServerThread implements Runnable { //tcp server
-        ServerSocket serverSocket;
-
-        public ServerThread() {
-        	
-        }
-
-        public void run() {
-           // String incomingMsg;
-        	String outgoingMsg="";
-        	try {
-            	
-              //  mytext.setText("Starting socket thread...\n");
-
-                serverSocket = new ServerSocket(5123);
-                
-                Log.d("ServerSocket"," waiting for incoming connections...");
-                while(true){
-                	try{
-                	Log.d("ServerSocket","Before accept...");	
-                	Socket socket = serverSocket.accept();
-                
-                BufferedWriter out = new BufferedWriter(new OutputStreamWriter(
-                        socket.getOutputStream()));
-                BufferedReader in = new BufferedReader(new InputStreamReader(
-                        socket.getInputStream()));
-               String incomingMsg=in.readLine();
-               // camera(incomingMsg);
-                //    mytext.setText("Connection accepted, reading...\n");
-               Log.d("ServerSocket","Connected to server");
-                    while (socket.isConnected()) {
-                    	
-                        Log.d("Message recieved","message:"+ incomingMsg
-                                + ". Answering...");
-                    	String test="";
-                    	//make button visible
-                    	if(test=="yes"){
-                    	String result="";
-                    //	makebuttonvisible();
-                        // send a message
-                        outgoingMsg = "hello: "
-                                + "result: " + result
-                                + System.getProperty("line.separator");
-                        out.write(outgoingMsg);
-                        out.flush();
-                    	}
-
-                        Log.d("Message sent","Sent: " + outgoingMsg);
-                    }
-
-                    if (socket.isConnected()) Log.d("serversocket status:", "Socket still connected");
-                    else{ 
-                    	Log.d("Serversocket status: ","Socket not connected");
-                    	socket.close();	
-                    }
-                
-                }catch(IOException e)
-                	{
-                		Log.d("Serversocket", "error at accept");
-                	}
-                }
-            } catch (Exception e) {
-            	Log.d("serversocket: ", "Error: " + e.getMessage()+"\n");
-                e.printStackTrace();
-            }
-
-        }
-        
-    }
-	*/
 	 public String getLocalIpAddress() {//get ipv4 address of device
 	    	String ip="";
 	        try {
@@ -691,8 +659,6 @@ public void register(HashMap<String, String> RegisterData) {
 		ServerSocket serverSocket;
 		String outgoingMsg="";
     	try {        	
-          //  mytext.setText("Starting socket thread...\n");
-
             	Log.d("ServerSocket",getLocalIpAddress());
             while(true){
             	serverSocket = new ServerSocket(5123);
@@ -702,17 +668,15 @@ public void register(HashMap<String, String> RegisterData) {
             	BufferedWriter out = new BufferedWriter(new OutputStreamWriter(
                         socket.getOutputStream()));
 
-            BufferedReader in = new BufferedReader(new InputStreamReader(
+            	BufferedReader in = new BufferedReader(new InputStreamReader(
                     socket.getInputStream()));
-          String incomingMsg=in.readLine();
+            	String incomingMsg=in.readLine();
         //    String incomingMsg="something";
            // camera(incomingMsg);
             //    mytext.setText("Connection accepted, reading...\n");
-           Log.d("ServerSocket","Connected to server");
-           int i=1;
-                while (socket.isConnected()) {
-                	
-                    
+            	Log.d("ServerSocket","Connected to server");
+            	int i=1;
+                while (socket.isConnected()) {	                    
                 	String test="";
                 	//make button visible
                 	if(i==1)
@@ -723,10 +687,10 @@ public void register(HashMap<String, String> RegisterData) {
                 	if(test=="yes"){
                 		Log.d("Message recieved","message:"+ incomingMsg
                                 + ". Answering...");
-                	String result="hello";
+                	String result="yes";
                 //	makebuttonvisible();
                     // send a message
-                    outgoingMsg =  "result: " + result
+                    outgoingMsg =  result
                             + System.getProperty("line.separator");
                     
                     out.write(outgoingMsg);
@@ -794,26 +758,16 @@ public void register(HashMap<String, String> RegisterData) {
         }
 
         protected void onPostExecute(String answer) {
-        //	TextView mytext;
-    	//	mytext= (TextView) findViewById(R.id.reply);
+
         	Log.d("clientsocket", "at execute " +answer);
         	try {
 				socket.close();
+				Log.d("clientsocket", "closing socket");
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-          /*  if (socket != null) {
-               // Toast.makeText(this, answer, Toast.LENGTH_LONG).show();
-         //   	mytext.append(answer);
-	 	 //       mytext.append("\n");
-            	Log.d("clientsocket", "reply: " +answer);
-            } else {
-               // Toast.makeText(context, "Can't connect to server!",
-         //   	mytext.append("Can't connect to server\n");
-            	Log.d("clientsocket", "cannot connect to server");
-            }
-			*/
+
         }
     }
 	

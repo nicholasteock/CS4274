@@ -19,8 +19,10 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.Enumeration;
 
 import mobile_psg.mpsgStarter.MPSG;
 import mobile_psg.mpsgStarter.MpsgStarter;
@@ -112,9 +114,9 @@ public class TCP_Session_Handler {
 						MPSG.DynamicContextData.put("person.magnetism", "positive");
 						MPSG.DynamicContextData.put("person.location", "school");
 						MPSG.DynamicContextData.put("person.mood", "stressed");
-						MPSG.DynamicContextData.put("elderly.ipaddress", "0.0.0.0");
+						MPSG.DynamicContextData.put("elderly.ipaddress", getLocalIpAddress());
 						MPSG.DynamicContextData.put("elderly.location", Double.toString(curr.getLatitude()) + " " + Double.toString(curr.getLongitude()));
-						MPSG.DynamicContextData.put("caretaker.ipaddress", "1.0.0.0");
+						MPSG.DynamicContextData.put("caretaker.ipaddress", getLocalIpAddress());
 						MPSG.DynamicContextData.put("caretaker.location", Double.toString(curr.getLatitude()) + " " + Double.toString(curr.getLongitude()));
 						
 						
@@ -446,5 +448,23 @@ public class TCP_Session_Handler {
 		
 	}
 	
-	
+	public String getLocalIpAddress() {//get ipv4 address of device
+    	String ip="";
+        try {
+            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
+                NetworkInterface intf = en.nextElement();
+                for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
+                    InetAddress inetAddress = enumIpAddr.nextElement();
+                  //  if (!inetAddress.isLoopbackAddress()) {
+                    if(inetAddress.isSiteLocalAddress()){
+                    	ip = "local address: "+ inetAddress.getHostAddress() +"\n";
+                    }
+                }
+            }
+            return ip;
+        } catch (SocketException ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
 }
