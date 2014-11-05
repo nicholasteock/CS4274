@@ -106,7 +106,7 @@ public class MPSG {
 		// Temporarily assign ip of proxy for testing
 		/*
 		try {
-			proxyIp = InetAddress.getByName("192.168.0.14");
+			proxyIp = InetAddress.getByName("192.168.10.55");
 		} catch (Exception e) {}*/
 	} 
 	
@@ -274,7 +274,7 @@ public void register(HashMap<String, String> RegisterData) {
 		
 		/*
 		try {
-		proxyIp = InetAddress.getByName("192.168.0.14");
+		proxyIp = InetAddress.getByName("192.168.10.55");
 		} catch(Exception e) {}*/
 		
 		// Create socket connection to the proxy
@@ -604,7 +604,7 @@ public void register(HashMap<String, String> RegisterData) {
 			
 			Log.d("contactuser","query result:"+queryResult);
 			
-			clientsender= new ClientSender("192.168.0.23");
+			clientsender= new ClientSender("192.168.10.56");
 			try {
 				result=clientsender.execute("192.168.1.1:8091"+"\n").get();
 			} catch (InterruptedException e) {
@@ -687,7 +687,7 @@ public void register(HashMap<String, String> RegisterData) {
                 	if(test=="yes"){
                 		Log.d("Message recieved","message:"+ incomingMsg
                                 + ". Answering...");
-                	String result="yes";
+                	String result="realfall";
                 //	makebuttonvisible();
                     // send a message
                     outgoingMsg =  result
