@@ -106,7 +106,7 @@ public class MPSG {
 		// Temporarily assign ip of proxy for testing
 		/*
 		try {
-			proxyIp = InetAddress.getByName("192.168.10.55");
+			proxyIp = InetAddress.getByName("192.168.0.12");
 		} catch (Exception e) {}*/
 	} 
 	
@@ -275,7 +275,7 @@ public void register(HashMap<String, String> RegisterData) {
 		
 		/*
 		try {
-		proxyIp = InetAddress.getByName("192.168.10.55");
+		proxyIp = InetAddress.getByName("192.168.0.12");
 		} catch(Exception e) {}*/
 		
 		// Create socket connection to the proxy
