@@ -106,7 +106,7 @@ public class MPSG {
 		// Temporarily assign ip of proxy for testing
 		/*
 		try {
-			proxyIp = InetAddress.getByName("192.168.0.14");
+			proxyIp = InetAddress.getByName("192.168.10.55");
 		} catch (Exception e) {}*/
 	} 
 	
@@ -121,14 +121,14 @@ public void register(HashMap<String, String> RegisterData) {
 		else {
 			StaticContextData = "caretaker.name::" + RegisterData.get("username") + ",caretaker.phonenum::" + RegisterData.get("userPhone") + ",caretaker.location::nil,caretaker.ipaddress::nil";
 	       
-		/*	Thread serverthread= new Thread(){
+			Thread serverthread= new Thread(){
 				public void run()
 				{
 					serverstart();
 				}
 			};
 	        serverthread.start();
-	        */
+	        
 			if(RegisterData.get("isFamily") == "true") {
 				
 				StaticContextData += ",caretaker.identity::caretaker";
@@ -275,7 +275,7 @@ public void register(HashMap<String, String> RegisterData) {
 		
 		/*
 		try {
-		proxyIp = InetAddress.getByName("192.168.0.14");
+		proxyIp = InetAddress.getByName("192.168.10.55");
 		} catch(Exception e) {}*/
 		
 		// Create socket connection to the proxy
@@ -444,7 +444,14 @@ public void register(HashMap<String, String> RegisterData) {
 		
 		List<String> sortedContacts = getContacts(contacts, locations);
 		
-		boolean result = contactUsers(sortedContacts);
+		int result = contactUsers(sortedContacts);
+		//if result is 1 then caretaker is contacted and its a real fall
+		//if result is 0 then not fall 
+		//if result is -1 then is ignored and caretaker list exhausted
+		
+		Log.d("isfall","Result: "+result);
+		
+		
 		/*
 
 		
@@ -586,7 +593,7 @@ public void register(HashMap<String, String> RegisterData) {
 		return test;
 	}
 		
-	public boolean contactUsers(List<String> userProximities) {
+	public int contactUsers(List<String> userProximities) {
 			//TCP client to connect to caretakers TCP server
 			//Loop until positive response from a caretaker
 			//Once positive response send message to caretaker server to invoke IP camera
@@ -594,7 +601,7 @@ public void register(HashMap<String, String> RegisterData) {
 		Log.d("contactuser", "attempting to connect");
 		String result="ignorefall";
 		int i =0;
-		while(result.equals("ignorefall")){
+		while(result.equals("ignorefall")&& i<userProximities.size()){
 			
 			queryString = mpsgName + ";query:select caretaker.ipaddress from caretaker where caretaker.name = \"" + userProximities.get(i) + "\"";
 			conn.sendQuery(queryString);
@@ -617,24 +624,23 @@ public void register(HashMap<String, String> RegisterData) {
 				e.printStackTrace();
 			}
 			Log.d("contactuser","result is: "+ result);
-			i++;
 			
-			if(result.equals("falsefall")) //false alarm
+			if(result.equals("ignorefall"))//ignore fall increment to nxt caretaker
 			{
-				return false;
+				i++;
 			}
 			
-			if(result.equals("realfall")) //real fall
-			{
-				return true;
-			}
-			
-			if(i==userProximities.size()) //if maximum size of the caretaker list is reached
-			{
-				return false;
-			}
 		}
-		return true;
+		if(result.equals("falsefall")) //false alarm
+		{
+			return 0;
+		}
+		
+		if(result.equals("realfall")) //real fall
+		{
+			return 1;
+		}
+		return -1;//list of caretakers exhausted
 	}
 	
 	 public String getLocalIpAddress() {//get ipv4 address of device
@@ -661,7 +667,7 @@ public void register(HashMap<String, String> RegisterData) {
 		ServerSocket serverSocket;
 		String outgoingMsg="";
     	try {        	
-            	Log.d("ServerSocket",getLocalIpAddress());
+            	//Log.d("ServerSocket",getLocalIpAddress());
             while(true){
             	serverSocket = new ServerSocket(5123);
                 
@@ -673,39 +679,29 @@ public void register(HashMap<String, String> RegisterData) {
             	BufferedReader in = new BufferedReader(new InputStreamReader(
                     socket.getInputStream()));
             	String incomingMsg=in.readLine();
-        //    String incomingMsg="something";
-           // camera(incomingMsg);
-            //    mytext.setText("Connection accepted, reading...\n");
-            	//MpsgStarter.load
+
+            	MpsgStarter.mHandler.sendEmptyMessage(0);
             	Log.d("ServerSocket","Connected to server");
-            	int i=1;
+        		Log.d("Message recieved","message:"+ incomingMsg
+                        + ". Answering...");
             	while(true)
             	{
-            		String test="";
-                	//make button visible
-                	if(i==1)
-                	{
-                		test="yes";
-                	}
-                	if(i==2){test="";}
-                	if(MpsgStarter.getCaretakerResponse()=="realfall"||MpsgStarter.getCaretakerResponse()=="falsefall"||MpsgStarter.getCaretakerResponse()=="ignorefall"){
-                		Log.d("Message recieved","message:"+ incomingMsg
-                                + ". Answering...");
+            		String test=MpsgStarter.getCaretakerResponse();
+                	if(test.equals("realfall")||test.equals("falsefall")||test.equals("ignorefall")){
+
                 	String result=MpsgStarter.getCaretakerResponse();
-                //	makebuttonvisible();
+                	Log.d("helpstatus",result);
+                	
                     // send a message
                     outgoingMsg =  result
                             + System.getProperty("line.separator");
                     
                     out.write(outgoingMsg);
                     out.flush();
+                    MpsgStarter.setHelpstatus("");
                     Log.d("Message sent","Sent: " + outgoingMsg);
                     break;
                 	}
-                	//loadfallalertscreen
-                	//helpstatus variable
-                	//getcaretakerresponse
-                    i++;
             	}
             	Log.d("serversocket status:","out of loop");
                 if(socket.getInputStream().read()!=-1) {	                    

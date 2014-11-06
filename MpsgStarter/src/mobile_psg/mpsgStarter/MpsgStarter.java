@@ -110,7 +110,7 @@ GooglePlayServicesClient.OnConnectionFailedListener{
     private static final int SERVERPORT = 5000;
     
     private Context myContext = this;
-    private static Handler mHandler;
+    public static Handler mHandler;
     private static String resultStr = "";
     private static String connStatus = "Start MPSG";
     private static String resultString = "";
@@ -359,13 +359,13 @@ GooglePlayServicesClient.OnConnectionFailedListener{
         falsefall.setVisibility(View.INVISIBLE);
         realfall.setVisibility(View.INVISIBLE);
         
-        Thread serverthread= new Thread(){
+       /* Thread serverthread= new Thread(){
 			public void run()
 			{
 				serverstart();
 			}
 		};
-        serverthread.start();
+        serverthread.start();*/
         
         query.setVisibility(View.VISIBLE);
         queryInput.setVisibility(View.VISIBLE);
