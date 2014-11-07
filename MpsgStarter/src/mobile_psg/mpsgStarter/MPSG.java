@@ -83,11 +83,18 @@ public class MPSG {
 	public static boolean isQueryReady = false;
 	public static String  queryResult = "";
 	
+	public static String elderlyname="";
+	public static String elderlylocation="";
 	//declare clientsender
-	private ClientSender clientsender;
+	private static ClientSender clientsender;
+	
+	private static List<String> nearestContacts = new ArrayList<String>();
+	private static List<Pair<String, Double>> userDistancePair = new ArrayList<Pair<String, Double>>();
+	private static List<String> contacts = new ArrayList<String>();;
+	private static List<String[]> locations = new ArrayList<String[]>();; 
 
 	// Temporary query string to be sent to the proxy
-	String queryString = mpsgName + ";query:select person.preference from person where person.name = \"testmpsgname1\"";
+	static String queryString = mpsgName + ";query:select person.preference from person where person.name = \"testmpsgname1\"";
 	String updateString = "update::person.name::testmpsgname1,person.preference::pc,person.location::home,person.isBusy::yes,person.speed::nil,person.action::eating,person.power::low,person.mood::happy,person.acceleration::nil,person.gravity::nil,person.magnetism::nil";
 	//String queryString = mpsgName + ";query:select person.magnetism from person where person.acceleration = \"fast\" and person.gravity=\"medium\"";
 //	String queryString = mpsgName + ";query:select person.location,person.magnetism from person where person.acceleration = \"fast\" and person.name = \"testmpsgname2\"";// ) or ( person.acceleration = \"fast\" and person.magnetism = \"positive\" )";
@@ -106,7 +113,7 @@ public class MPSG {
 		// Temporarily assign ip of proxy for testing
 		/*
 		try {
-			proxyIp = InetAddress.getByName("192.168.0.12");
+			proxyIp = InetAddress.getByName("192.168.10.55");
 		} catch (Exception e) {}*/
 	} 
 	
@@ -117,6 +124,7 @@ public void register(HashMap<String, String> RegisterData) {
 		
 		if(ContextType == "elderly") {
 			StaticContextData = "elderly.name::" + RegisterData.get("username") + ",elderly.status::normal,elderly.phonenum::" + RegisterData.get("userPhone") + ",elderly.noknum::" + RegisterData.get("nokPhone")+ ",elderly.ipaddress::nil,elderly.location::nil";
+			elderlyname= RegisterData.get("username");
 		}
 		else {
 			StaticContextData = "caretaker.name::" + RegisterData.get("username") + ",caretaker.phonenum::" + RegisterData.get("userPhone") + ",caretaker.location::nil,caretaker.ipaddress::nil";
@@ -275,7 +283,7 @@ public void register(HashMap<String, String> RegisterData) {
 		
 		/*
 		try {
-		proxyIp = InetAddress.getByName("192.168.0.12");
+		proxyIp = InetAddress.getByName("192.168.10.55");
 		} catch(Exception e) {}*/
 		
 		// Create socket connection to the proxy
@@ -402,10 +410,11 @@ public void register(HashMap<String, String> RegisterData) {
 	}
 	
 	//Elderly(Client) Side Code
-	public void runFallDetectedSequence() {
+	public static void runFallDetectedSequence() {
 		
 		//queryString = mpsgName + ";query:select elderly.location from elderly where elderly.name = \"kw\"";
 		//queryString = mpsgName + ";query:select elderly.location from elderly";
+		
 		queryString = mpsgName + ";query:select caretaker.name from caretaker where caretaker.identity = \"caretaker\"";
 		conn.sendQuery(queryString);
 		
@@ -415,8 +424,14 @@ public void register(HashMap<String, String> RegisterData) {
 		
 		Log.d("QUERY", queryResult);
 		
-		List<String> contacts = new ArrayList<String>();
-		List<String[]> locations = new ArrayList<String[]>();
+		//List<String> contacts = new ArrayList<String>();
+		//List<String[]> locations = new ArrayList<String[]>();
+		//contacts = new ArrayList<String>();
+		//locations = new ArrayList<String[]>();
+		if(!contacts.isEmpty())
+			contacts.clear();
+		if(!locations.isEmpty())
+			locations.clear();
 		
 		String temp[] = queryResult.split(",");
 		
@@ -442,71 +457,23 @@ public void register(HashMap<String, String> RegisterData) {
 			
 		}
 		
-		List<String> sortedContacts = getContacts(contacts, locations);
+		//List<String> sortedContacts = 
+		getContacts();
 		
-		int result = contactUsers(sortedContacts);
+		int result = contactUsers();
 		//if result is 1 then caretaker is contacted and its a real fall
 		//if result is 0 then not fall 
 		//if result is -1 then is ignored and caretaker list exhausted
 		
 		Log.d("isfall","Result: "+result);
 		
-		
-		/*
-
+	
 		
 		
-		/*
-		String temp[] = queryResult.split("=");
-		String latAndLong[] = temp[1].split(" ");
-		
-		Log.d("Latitude", latAndLong[0]);
-		Log.d("Longitude", latAndLong[1]);
-		
-		double latDeg = Double.parseDouble(latAndLong[0]);
-		double longDeg = Double.parseDouble(latAndLong[1]);
-		double lat2Deg = 1.321683;
-		double long2Deg = 103.845003;
-		
-		double R = 6371;
-		double latRad = Math.toRadians(latDeg);
-		double lat2Rad = Math.toRadians(lat2Deg);
-		double diffLat = Math.toRadians(lat2Deg - latDeg);
-		double diffLong = Math.toRadians(long2Deg - longDeg);
-		
-		double a = Math.sin(diffLat/2)* Math.sin(diffLat/2) +
-			    Math.cos(latRad) * Math.cos(lat2Rad) * 
-			    Math.sin(diffLong/2) * Math.sin(diffLong/2);
-		
-		double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-		
-		double distance =  R * c;
-		
-		Log.d("Distance", Double.toString(distance));*/
-		
-		
-		
-		//String contactList[] = getContacts();
-		
-		/*
-		String[][] userProximities = new String[100][1];
-		userProximities = calculateUsersProximity();
-		//Querys for location context of registered users and return array of user + proximity 
-			
-		boolean isFall;
-			
-		isFall = contactUsers(userProximities);
-			
-		//if(isFall == true)
-				//contactNextOfKin();
-		//else
-				//return;
-				
-			*/
 				
 	}
 	
-	private List<String> getContacts(List<String> contacts, List<String[]> locations) {
+	private static void getContacts() {
 
 		//after querying i have 2 lists of name and location
 		String elderlyLoc[] = new String[2];
@@ -517,8 +484,10 @@ public void register(HashMap<String, String> RegisterData) {
 		//List<String> contacts = new ArrayList<String>();
 		//List<String[]> locations = new ArrayList<String[]>();
 		
-		List<Pair<String, Double>> userDistancePair = getDistances(contacts, locations, elderlyLoc);
-		
+		//List<Pair<String, Double>> userDistancePair = getDistances(contacts, locations, elderlyLoc);
+		if(!userDistancePair.isEmpty())
+			userDistancePair.clear();
+		getDistances(elderlyLoc);
 		
 		// do sorting
 		Pair<String, Double> temp;
@@ -527,26 +496,30 @@ public void register(HashMap<String, String> RegisterData) {
 			for (int v = 1; v < (userDistancePair.size() - i); v++) {
 				if (userDistancePair.get(v-1).second > userDistancePair.get(v).second) {
 					temp = userDistancePair.get(v-1);
-			        userDistancePair.add(v-1, userDistancePair.get(v));
-			        userDistancePair.add(v, temp);
+			        userDistancePair.set(v-1, userDistancePair.get(v));
+			        userDistancePair.set(v, temp);
 			     }
 			 }
 		}  
 		
-		List<String> nearestContacts = new ArrayList<String>();
+		if(!nearestContacts.isEmpty())
+			nearestContacts.clear();
+		//nearestContacts = new ArrayList<String>();
 		
 		for (int i = 0; i < userDistancePair.size(); i++) {
 			nearestContacts.add(userDistancePair.get(i).first);
 			Log.d("CONTACT", nearestContacts.get(i));
 		}
 		
-		return nearestContacts;
+		//userDistancePair = null;
+		return;
 		
 	}
 	
-	private List<Pair<String, Double>> getDistances(List<String> contacts, List<String[]> locations, String[] elderlyLoc) {
+	private static void getDistances(String[] elderlyLoc) {
 		
-		List<Pair<String, Double>> userDistancePair = new ArrayList<Pair<String, Double>>();
+		//List<Pair<String, Double>> userDistancePair = new ArrayList<Pair<String, Double>>();
+		//userDistancePair = new ArrayList<Pair<String, Double>>();
 		double distance;
 		
 		
@@ -559,10 +532,10 @@ public void register(HashMap<String, String> RegisterData) {
 			
 		}
 		
-		return userDistancePair;
+		return;
 	}
 	
-	private double calcDistance(String[] latAndLong1, String[] latAndLong2) {
+	private static double calcDistance(String[] latAndLong1, String[] latAndLong2) {
 		
 		
 		double lat1Deg = Double.parseDouble(latAndLong1[0]);
@@ -593,17 +566,18 @@ public void register(HashMap<String, String> RegisterData) {
 		return test;
 	}
 		
-	public int contactUsers(List<String> userProximities) {
+	public static int contactUsers() {
 			//TCP client to connect to caretakers TCP server
 			//Loop until positive response from a caretaker
 			//Once positive response send message to caretaker server to invoke IP camera
 			//get response from caretaker and return true/false of fall
 		Log.d("contactuser", "attempting to connect");
+		String check="testing";
 		String result="ignorefall";
 		int i =0;
-		while(result.equals("ignorefall")&& i<userProximities.size()){
+		while(result.contains("ignorefall")&& i<nearestContacts.size()){
 			
-			queryString = mpsgName + ";query:select caretaker.ipaddress from caretaker where caretaker.name = \"" + userProximities.get(i) + "\"";
+			queryString = mpsgName + ";query:select caretaker.ipaddress from caretaker where caretaker.name = \"" + nearestContacts.get(i) + "\"";
 			conn.sendQuery(queryString);
 			
 			while(isQueryReady == false) {}
@@ -615,7 +589,8 @@ public void register(HashMap<String, String> RegisterData) {
 			Log.d("contactuser","ipadd:"+ipadd[1]);
 			clientsender= new ClientSender(ipadd[1]);
 			try {
-				result=clientsender.execute("192.168.1.1:8091"+"\n").get();
+				result=clientsender.execute("192.168.1.1:8091,"+elderlyname+"\n").get();
+				//check=result;
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -625,18 +600,20 @@ public void register(HashMap<String, String> RegisterData) {
 			}
 			Log.d("contactuser","result is: "+ result);
 			
-			if(result.equals("ignorefall"))//ignore fall increment to nxt caretaker
+			if(result.contains("ignorefall"))//ignore fall increment to nxt caretaker
 			{
+				Log.d("increment","add i");
 				i++;
 			}
 			
 		}
-		if(result.equals("falsefall")) //false alarm
+		
+		if(result.contains("falsefall")) //false alarm
 		{
 			return 0;
 		}
 		
-		if(result.equals("realfall")) //real fall
+		if(result.contains("realfall")) //real fall
 		{
 			return 1;
 		}
@@ -679,11 +656,27 @@ public void register(HashMap<String, String> RegisterData) {
             	BufferedReader in = new BufferedReader(new InputStreamReader(
                     socket.getInputStream()));
             	String incomingMsg=in.readLine();
-
-            	MpsgStarter.mHandler.sendEmptyMessage(0);
+            	
             	Log.d("ServerSocket","Connected to server");
         		Log.d("Message recieved","message:"+ incomingMsg
                         + ". Answering...");
+        		
+        		String message[]=incomingMsg.split(",");
+        		Log.d("Message recieved","Split message:"+ message[0]
+                        + "Next: " + message[1]);
+        		
+        		queryString = mpsgName + ";query:select elderly.location from elderly where elderly.name = \"" + message[1] + "\"";
+    			conn.sendQuery(queryString);
+    			
+    			while(isQueryReady == false) {}
+    			
+    			isQueryReady = false;
+    			
+    			elderlyname=message[1];
+    			elderlylocation=queryResult.split("=")[1];
+    			Log.d("Elderly location:",elderlylocation);
+            	MpsgStarter.mHandler.sendEmptyMessage(0);
+
             	while(true)
             	{
             		String test=MpsgStarter.getCaretakerResponse();
@@ -723,7 +716,7 @@ public void register(HashMap<String, String> RegisterData) {
         }
     	
 	}
-	private class ClientSender extends AsyncTask<String, Void, String> { //tcpclient
+	private static class ClientSender extends AsyncTask<String, Void, String> { //tcpclient
         private String SERVER_IP = null;
 		private Socket socket;
         private String answer;

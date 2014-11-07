@@ -117,7 +117,7 @@ GooglePlayServicesClient.OnConnectionFailedListener{
     private static String queryStatus = "invisible";
     private static String helpStatus = "";
     
-    private static boolean checktcp= false;
+    private static Intent intent;
     
     private static String userChoice = "";
   //  private ServerThread server;
@@ -359,16 +359,9 @@ GooglePlayServicesClient.OnConnectionFailedListener{
         falsefall.setVisibility(View.INVISIBLE);
         realfall.setVisibility(View.INVISIBLE);
         
-       /* Thread serverthread= new Thread(){
-			public void run()
-			{
-				serverstart();
-			}
-		};
-        serverthread.start();*/
         
-        query.setVisibility(View.VISIBLE);
-        queryInput.setVisibility(View.VISIBLE);
+        query.setVisibility(View.INVISIBLE);
+        queryInput.setVisibility(View.INVISIBLE);
         
     };
     
@@ -412,7 +405,25 @@ GooglePlayServicesClient.OnConnectionFailedListener{
         falsefall.setVisibility(View.VISIBLE);
         realfall.setVisibility(View.VISIBLE);
     };
-
+    
+    private void loadElderlyLocationScreen() {
+        connectedText.setText("Elderly Name: "+ MPSG.elderlyname +"\n Elderly Location: " + MPSG.elderlylocation);
+        connectedText.setVisibility(View.VISIBLE);
+        leaveSend.setVisibility(View.VISIBLE);
+        bluetoothText.setVisibility(View.INVISIBLE);
+        newDevicesList.setVisibility(View.INVISIBLE);
+        fallalertText.setVisibility(View.INVISIBLE);
+        ignorefall.setVisibility(View.INVISIBLE);
+        viewfall.setVisibility(View.INVISIBLE);
+        verifyfallText.setVisibility(View.INVISIBLE);
+        falsefall.setVisibility(View.INVISIBLE);
+        realfall.setVisibility(View.INVISIBLE);
+        
+        query.setVisibility(View.INVISIBLE);
+        queryInput.setVisibility(View.INVISIBLE);
+        
+    };
+    
     // Checks user inputs before submitting for registration.
     private boolean validateUserInputs() {
     	
@@ -485,6 +496,7 @@ GooglePlayServicesClient.OnConnectionFailedListener{
 			String inputNokPhone 	= nokPhone.getText().toString();
 		
 			registerParams.put("identity", "elderly");
+			
 			registerParams.put("username", inputName);
 			registerParams.put("userPhone", inputPhone);
 			registerParams.put("nokPhone", inputNokPhone);
@@ -548,8 +560,13 @@ GooglePlayServicesClient.OnConnectionFailedListener{
     	if (MPSG.statusString.contentEquals("Connected")) {
     		registerEndTime = System.currentTimeMillis();
         	// Start the Service which updates the context information for the MPSG
-        	Intent contextUpdater = new Intent(myContext, ContextUpdatingService.class);
-        	startService(contextUpdater);
+        	intent = new Intent(myContext, ContextUpdatingService.class);
+        	if(registerParams.get("identity")=="elderly")
+        	{
+        		Log.d("contextservice","entered if");
+        		startService(intent);
+        	}
+        		
         	
         	connStatus = "invisible";
         	loadConnectedScreen();
@@ -665,7 +682,9 @@ GooglePlayServicesClient.OnConnectionFailedListener{
         		}
         	};
         	leaveThread.start();
-        	
+        	//Intent intent=new Intent(myContext, ContextUpdatingService.class);
+        	boolean check=stopService(intent);
+        	Log.d("servicestop",Boolean.toString(check));
         	int i = 0;
         	// Wait for a result in registering through proxy
         	while (MPSG.leaveStatusString.contentEquals("Disconnecting")) {
@@ -725,7 +744,8 @@ GooglePlayServicesClient.OnConnectionFailedListener{
         public void onClick(View v) {
             Log.d("FALLFLOW", "In realfallListener");
             setHelpstatus("realfall");
-            loadCaretakerConnectedScreen();
+            //loadCaretakerConnectedScreen();
+            loadElderlyLocationScreen();
         }
     };
     
@@ -891,7 +911,7 @@ GooglePlayServicesClient.OnConnectionFailedListener{
 		startActivity(intent);
     }
     
-    protected void onDestroy() {
+ /*   protected void onDestroy() {
 
         super.onDestroy();
         if(bluetooth != null)
@@ -899,64 +919,5 @@ GooglePlayServicesClient.OnConnectionFailedListener{
         unregisterReceiver(mReceiver);
     }
     
-    private void serverstart(){
-		ServerSocket serverSocket;
-		String outgoingMsg="";
-    	try {        	
-            	//Log.d("ServerSocket",getLocalIpAddress());
-            while(true){
-            	serverSocket = new ServerSocket(5123);
-                
-                Log.d("ServerSocket"," waiting for incoming connections...");
-            	Socket socket = serverSocket.accept();
-            	BufferedWriter out = new BufferedWriter(new OutputStreamWriter(
-                        socket.getOutputStream()));
-
-            	BufferedReader in = new BufferedReader(new InputStreamReader(
-                    socket.getInputStream()));
-            	String incomingMsg=in.readLine();
-
-            	mHandler.sendEmptyMessage(0);
-            	Log.d("ServerSocket","Connected to server");
-        		Log.d("Message recieved","message:"+ incomingMsg
-                        + ". Answering...");
-            	while(true)
-            	{
-            		String test=getCaretakerResponse();
-                	if(test.equals("realfall")||test.equals("falsefall")||test.equals("ignorefall")){
-
-                	String result=getCaretakerResponse();
-                	Log.d("helpstatus",result);
-                	
-                    // send a message
-                    outgoingMsg =  result
-                            + System.getProperty("line.separator");
-                    
-                    out.write(outgoingMsg);
-                    out.flush();
-                    setHelpstatus("");
-                    Log.d("Message sent","Sent: " + outgoingMsg);
-                    break;
-                	}
-            	}
-            	Log.d("serversocket status:","out of loop");
-                if(socket.getInputStream().read()!=-1) {	                    
-                	Log.d("serversocket status:", "Socket still connected");
-                }
-                else
-                {
-                	Log.d("Serversocket status: ","Socket not connected");
-                	socket.close();	
-                }
-                
-                serverSocket.close();
-            }
-            
-            
-        } catch (Exception e) {
-        	Log.d("serversocket: ", "Error: " + e.getMessage()+"\n");
-            e.printStackTrace();
-        }
-    	
-	}
+   */
 }
