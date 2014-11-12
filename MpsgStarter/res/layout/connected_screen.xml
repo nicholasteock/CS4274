@@ -28,6 +28,28 @@
         android:text="Disconnect" />
     
     <TextView
+    	android:id="@+id/bluetoothDcText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/leaveSend"
+        android:layout_marginTop="20dp"
+        android:text="BLUETOOTH TAG DISCONNECTED!"
+        android:textSize="30sp"
+        android:textColor="#FF0000"
+        android:gravity="center"
+        tools:ignore="HardcodedText" />
+    
+    <Button
+        android:id="@+id/bluetoothDcButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/bluetoothDcText"
+        android:layout_marginTop="20dp"
+        android:text="OK" />
+    
+    <TextView
     	android:id="@+id/bluetoothText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -43,7 +65,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/bluetoothText"
-        android:layout_marginTop="20dp" >
+        android:layout_marginTop="60dp" >
     </ListView>
     
  	<TextView

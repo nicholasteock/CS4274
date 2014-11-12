@@ -102,14 +102,14 @@ public class ContextUpdatingService extends IntentService implements SensorEvent
 			    MPSG.DynamicContextData.put("person.acceleration", valueString);*/
 			   
 			    //if(accel == 10.0) {
-			    if(accel >= 9.0 && accel <= 11.0) {
+			    if(accel >= 8.0 && accel <= 12.0) {
 			    	isStill = true;
 			    } else {
 			    	isStill = false;
 			    }
 			    
 			    if(isFallDetected == false) {
-				    if(accel <= 5.0) {
+				    if(accel <= 6.0) {
 				    	lowThreshold = true;
 				    	start = System.currentTimeMillis();
 				    	
@@ -316,7 +316,7 @@ public class ContextUpdatingService extends IntentService implements SensorEvent
 		
 		while(isStill == true && isPosChanged == true) {
 			
-			if((System.currentTimeMillis() - mStart) > 20000) {
+			if((System.currentTimeMillis() - mStart) > 10000) {
 				
 				if(isPosChanged == true) {
 					//MPSG.sendQuery("");

@@ -408,8 +408,10 @@ containing a value of this type.
         public static final int powered_by_google_light=0x7f020020;
     }
     public static final class id {
-        public static final int action_settings=0x7f070031;
-        public static final int bluetoothText=0x7f070028;
+        public static final int action_settings=0x7f070033;
+        public static final int bluetoothDcButton=0x7f070029;
+        public static final int bluetoothDcText=0x7f070028;
+        public static final int bluetoothText=0x7f07002a;
         public static final int bluetoothTitleText=0x7f070014;
         public static final int book_now=0x7f070010;
         public static final int button2=0x7f070017;
@@ -422,15 +424,15 @@ containing a value of this type.
         public static final int elderlyOption=0x7f07001a;
         public static final int elderlyText=0x7f070022;
         public static final int errorText=0x7f070024;
-        public static final int fallalertText=0x7f070029;
-        public static final int falsefall=0x7f07002d;
+        public static final int fallalertText=0x7f07002b;
+        public static final int falsefall=0x7f07002f;
         public static final int familyMember=0x7f070021;
         public static final int familyMemberPhone=0x7f070023;
         public static final int grayscale=0x7f070012;
         public static final int holo_dark=0x7f070005;
         public static final int holo_light=0x7f070006;
         public static final int hybrid=0x7f070004;
-        public static final int ignorefall=0x7f07002a;
+        public static final int ignorefall=0x7f07002c;
         public static final int leaveSend=0x7f070027;
         public static final int match_parent=0x7f07000c;
         public static final int monochrome=0x7f070013;
@@ -444,9 +446,9 @@ containing a value of this type.
         public static final int personalText=0x7f07001c;
         public static final int production=0x7f070007;
         public static final int progressBar1=0x7f070019;
-        public static final int query=0x7f07002f;
-        public static final int queryInput=0x7f070030;
-        public static final int realfall=0x7f07002e;
+        public static final int query=0x7f070031;
+        public static final int queryInput=0x7f070032;
+        public static final int realfall=0x7f070030;
         public static final int registerPerson=0x7f070016;
         public static final int sandbox=0x7f070008;
         public static final int satellite=0x7f070002;
@@ -454,8 +456,8 @@ containing a value of this type.
         public static final int strict_sandbox=0x7f070009;
         public static final int terrain=0x7f070003;
         public static final int userPhone=0x7f07001e;
-        public static final int verifyfallText=0x7f07002c;
-        public static final int viewfall=0x7f07002b;
+        public static final int verifyfallText=0x7f07002e;
+        public static final int viewfall=0x7f07002d;
         public static final int welcomeText=0x7f070018;
         public static final int wrap_content=0x7f07000d;
     }

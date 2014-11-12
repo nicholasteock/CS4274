@@ -10,11 +10,16 @@ import com.google.android.gms.location.LocationRequest;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.ServerSocket;
@@ -27,6 +32,7 @@ import mobile_psg.sensorMonitor.ContextUpdatingService;
 import mobile_psg.tcpsession.TCP_Session_Handler;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.NotificationManager;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
@@ -40,6 +46,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -67,7 +74,7 @@ GooglePlayServicesClient.OnConnectionFailedListener{
 	private CheckBox isFamilyMember;
 	
 	private static LocationClient mLocationClient;
-		
+
 	private Button elderlyOption;
     private Button caretakerOption;
     private Button optionBack;
@@ -78,7 +85,8 @@ GooglePlayServicesClient.OnConnectionFailedListener{
     private Button ignorefall;
     private Button realfall;
     private Button falsefall;
-    
+    private Button bluetoothDcButton;
+   
     private EditText name;
     private EditText userPhone;
     private EditText nokPhone;
@@ -93,6 +101,7 @@ GooglePlayServicesClient.OnConnectionFailedListener{
     private static TextView connectedText;
     private static TextView fallalertText;
     private static TextView verifyfallText;
+    private static TextView bluetoothDcText;
     
     // Variables used for bluetooth
     private static CharSequence bluetoothToastText = "";
@@ -102,9 +111,12 @@ GooglePlayServicesClient.OnConnectionFailedListener{
 	private ArrayAdapter<String> newDeviceListArrayAdapter;
 	private static TextView bluetoothText;
 	private ListView newDevicesList;
-	private BluetoothSocket socket;
+	private BluetoothSocket btsocket;
 	private BluetoothDevice connect_device = null;
 	private static BluetoothAdapter bluetooth = null;
+	private static Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+	private static Ringtone r = null;
+	private static boolean keepTagConnected = false;
     
     private int timeout = 10; //10 seconds timeout for connecting
     private static final int SERVERPORT = 5000;
@@ -161,6 +173,7 @@ GooglePlayServicesClient.OnConnectionFailedListener{
         mHandler = new Handler(){
   		  @Override
   		  public void handleMessage(Message msg) {
+  			  showNotification();
   			  loadFallalertScreen();
   		     }
   		 };
@@ -249,6 +262,8 @@ GooglePlayServicesClient.OnConnectionFailedListener{
      //   query.setVisibility(View.INVISIBLE);
      //   queryInput.setVisibility(View.INVISIBLE);
         errorText.setText("");
+        
+        r = RingtoneManager.getRingtone(getApplicationContext(), notification);
     };
     
     private void loadElderlyRegisterScreen() {
@@ -299,11 +314,13 @@ GooglePlayServicesClient.OnConnectionFailedListener{
         fallalertText       = (TextView) findViewById(R.id.fallalertText);
         verifyfallText      = (TextView) findViewById(R.id.verifyfallText);
         bluetoothText 		= (TextView) findViewById(R.id.bluetoothText);
+        bluetoothDcText 	= (TextView) findViewById(R.id.bluetoothDcText);
         leaveSend           = (Button) findViewById(R.id.leaveSend);
         viewfall            = (Button) findViewById(R.id.viewfall);
         ignorefall          = (Button) findViewById(R.id.ignorefall);
         realfall            = (Button) findViewById(R.id.realfall);
         falsefall           = (Button) findViewById(R.id.falsefall);
+        bluetoothDcButton 	= (Button) findViewById(R.id.bluetoothDcButton);
         
         query 				= (Button) findViewById(R.id.query);
         queryInput			= (EditText) findViewById(R.id.queryInput);
@@ -315,6 +332,7 @@ GooglePlayServicesClient.OnConnectionFailedListener{
         ignorefall.setOnClickListener(ignorefallListener);
         realfall.setOnClickListener(realfallListener);
         falsefall.setOnClickListener(falsefallListener);
+        bluetoothDcButton.setOnClickListener(dcButtonListener);
         
         query.setOnClickListener(querySendListener);
         
@@ -351,6 +369,8 @@ GooglePlayServicesClient.OnConnectionFailedListener{
         connectedText.setVisibility(View.VISIBLE);
         leaveSend.setVisibility(View.VISIBLE);
         bluetoothText.setVisibility(View.INVISIBLE);
+        bluetoothDcText.setVisibility(View.INVISIBLE);
+        bluetoothDcButton.setVisibility(View.INVISIBLE);
         newDevicesList.setVisibility(View.INVISIBLE);
         fallalertText.setVisibility(View.INVISIBLE);
         ignorefall.setVisibility(View.INVISIBLE);
@@ -370,6 +390,8 @@ GooglePlayServicesClient.OnConnectionFailedListener{
         connectedText.setVisibility(View.VISIBLE);
         leaveSend.setVisibility(View.VISIBLE);
         bluetoothText.setVisibility(View.VISIBLE);
+        bluetoothDcText.setVisibility(View.INVISIBLE);
+        bluetoothDcButton.setVisibility(View.INVISIBLE);
         newDevicesList.setVisibility(View.VISIBLE);
         fallalertText.setVisibility(View.INVISIBLE);
         ignorefall.setVisibility(View.INVISIBLE);
@@ -378,10 +400,10 @@ GooglePlayServicesClient.OnConnectionFailedListener{
         falsefall.setVisibility(View.INVISIBLE);
         realfall.setVisibility(View.INVISIBLE);
         
-        query.setVisibility(View.VISIBLE);
-        queryInput.setVisibility(View.VISIBLE);
+        query.setVisibility(View.INVISIBLE);
+        queryInput.setVisibility(View.INVISIBLE);
         
-        enableBluetooth();
+//        enableBluetooth();
     };
 
     private void loadFallalertScreen() {
@@ -657,6 +679,16 @@ GooglePlayServicesClient.OnConnectionFailedListener{
         }      
     };
     
+    private OnClickListener dcButtonListener = new OnClickListener() { 
+        @Override
+        public void onClick(View v) {
+        	Log.d("BLUETOOTH", "DC button clicked");
+        	bluetoothDcText.setVisibility(View.INVISIBLE);
+            bluetoothDcButton.setVisibility(View.INVISIBLE);
+        	r.stop();
+        }
+    };
+    
     public static void setQueryResult (String result) {
        	Log.d("MPSG", "Setting query result to " + result);
        	resultStr = result + "\n";
@@ -681,6 +713,7 @@ GooglePlayServicesClient.OnConnectionFailedListener{
         			mpsg.disconnect();
         		}
         	};
+        	keepTagConnected = false;
         	leaveThread.start();
         	//Intent intent=new Intent(myContext, ContextUpdatingService.class);
         	boolean check=stopService(intent);
@@ -798,7 +831,8 @@ GooglePlayServicesClient.OnConnectionFailedListener{
     };
     
     public final BroadcastReceiver mReceiver = new BroadcastReceiver() {
-
+    	private int uuidlen;
+    	
         @Override
         public void onReceive(Context context, Intent intent) {
             // TODO Auto-generated method stub
@@ -814,19 +848,34 @@ GooglePlayServicesClient.OnConnectionFailedListener{
             }
             
             if(BluetoothDevice.ACTION_UUID.equals(action)) {
-            	Log.d("BLUETOOTH", "testing");
+            	uuidlen = connect_device.getUuids().length -1;
+            	Log.d("BLUETOOTH", "UUID "+connect_device.getUuids()[uuidlen].getUuid());
             	try {
-            		socket = connect_device.createRfcommSocketToServiceRecord(connect_device.getUuids()[0].getUuid());
-    	            socket.connect();
+            		
+            		btsocket = connect_device.createRfcommSocketToServiceRecord(connect_device.getUuids()[uuidlen].getUuid());
+    	            btsocket.connect();
     	            // Upon connection stop discovery and hide menu.
-    	            bluetooth.cancelDiscovery();
     	            bluetoothText.setVisibility(View.INVISIBLE);
     	            newDevicesList.setVisibility(View.INVISIBLE);
 	            } catch (IOException e) {
 	                // TODO Auto-generated catch block
-	            	Log.d("BLUETOOTHACTION", "Connection failed for " + connect_device.getUuids()[0].getUuid());
-	                e.printStackTrace();
+	            	Log.d("BLUETOOTHACTION", "Connection failed for " + connect_device.getUuids()[uuidlen].getUuid());
 	            }
+            }
+            
+            if(BluetoothDevice.ACTION_ACL_CONNECTED.equals(action)) {
+            	Log.d("BLUETOOTH", "Connected");
+            	keepTagConnected = true;
+            }
+            
+            if(BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action)) {
+            	Log.d("BLUETOOTH", "Disconnected");
+            	
+            	if(keepTagConnected) {
+            		bluetoothDcText.setVisibility(View.VISIBLE);
+                    bluetoothDcButton.setVisibility(View.VISIBLE);
+	            	r.play();
+            	}
             }
         }
     };
@@ -911,6 +960,52 @@ GooglePlayServicesClient.OnConnectionFailedListener{
 		startActivity(intent);
     }
     
+    public void showNotification(){
+        // define sound URI, the sound to be played when there's a notification
+
+        Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        /*
+        Intent resultIntent = new Intent(myContext, MpsgStarter.class);
+       
+        PendingIntent resultPendingIntent =
+            PendingIntent.getActivity(
+            this,
+            0,
+            resultIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT
+        );*/
+
+        // intent triggered, you can add other intent for other actions
+
+        //Intent intent = new Intent(this, NotificationReceiver.class);
+
+       // PendingIntent pIntent = PendingIntent.getActivity(MainActivity.this, 0, intent, 0);
+
+        long[] pattern = {0, 100, 1000};
+
+        // this is it, we'll build the notification!
+
+        // in the addAction method, if you don't want any icon, just set the first param to 0
+
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
+
+            .setContentTitle("ALERT!")
+            .setContentText("ELDERLY FALL DETECTED!")
+            .setVibrate(pattern)
+            .setSmallIcon(R.drawable.ic_launcher)
+            .setSound(soundUri);
+
+        //mBuilder.setContentIntent(resultPendingIntent);
+
+        NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
+        // If you want to hide the notification after it was selected, do the code below
+
+        // myNotification.flags |= Notification.FLAG_AUTO_CANCEL;
+
+        notificationManager.notify(0, mBuilder.build());
+
+    }
  /*   protected void onDestroy() {
 
         super.onDestroy();
